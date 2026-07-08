@@ -222,6 +222,22 @@
   /* ===== CONTENT ===== */
   .content { padding: 16px 20px; max-width: 1100px; margin: 0 auto; }
 
+  @keyframes slideFromRight {
+    from { opacity: 0; transform: translateX(32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes slideFromLeft {
+    from { opacity: 0; transform: translateX(-32px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #mainContent.anim-right { animation: slideFromRight 0.22s ease; }
+  #mainContent.anim-left  { animation: slideFromLeft  0.22s ease; }
+  #mainContent.anim-up    { animation: fadeUp         0.18s ease; }
+
   .indicator-card {
     background: var(--bg2);
     border: 1px solid var(--border);
@@ -1264,10 +1280,16 @@ function updateScores() {
   }
 }
 
-function renderContent() {
+function renderContent(animClass) {
   const data = getVersionData();
   const container = document.getElementById('mainContent');
   container.innerHTML = '';
+  // trigger slide animation
+  if (animClass) {
+    container.classList.remove('anim-right', 'anim-left', 'anim-up');
+    void container.offsetWidth; // reflow
+    container.classList.add(animClass);
+  }
 
   // Toolbar
   const toolbar = document.createElement('div');
@@ -1497,6 +1519,7 @@ function toggleIndicator(indId) {
 }
 
 function switchVersion(ver) {
+  const anim = ver === '2024' ? 'anim-right' : 'anim-left';
   currentVersion = ver;
   lastSelectAll = null;
   document.querySelectorAll('.version-btn').forEach(b => {
@@ -1504,7 +1527,7 @@ function switchVersion(ver) {
   });
   const typeBar = document.getElementById('typeBar');
   typeBar.classList.toggle('visible', ver === '2016');
-  renderContent();
+  renderContent(anim);
 }
 
 function switchType(type) {
@@ -1514,7 +1537,7 @@ function switchType(type) {
   document.querySelectorAll('.type-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick').includes(type));
   });
-  renderContent();
+  renderContent('anim-up');
 }
 
 function resetAll() {
