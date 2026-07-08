@@ -1264,6 +1264,9 @@ function renderContent() {
   const toolbar = document.createElement('div');
   toolbar.className = 'toolbar';
   toolbar.innerHTML = `
+    <button class="reset-btn" onclick="expandAll()">⊞ 全展開</button>
+    <button class="reset-btn" onclick="collapseAll()">⊟ 全收摺</button>
+    <span style="flex:1"></span>
     <button class="select-all-btn" onclick="selectAll(false)">☑ 全勾選（不含加分）</button>
     <button class="select-all-btn" onclick="selectAll(true)">☑ 全勾選（全加分）</button>
     <button class="reset-btn" onclick="resetAll()">🔄 清除全部</button>
@@ -1433,6 +1436,16 @@ function onTier(itemId, value) {
     }
   }
   updateScores();
+}
+
+function expandAll() {
+  document.querySelectorAll('.indicator-body').forEach(b => b.classList.add('open'));
+  document.querySelectorAll('.chevron').forEach(c => c.classList.add('open'));
+}
+
+function collapseAll() {
+  document.querySelectorAll('.indicator-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
 }
 
 function toggleIndicator(indId) {
