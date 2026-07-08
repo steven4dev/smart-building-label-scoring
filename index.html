@@ -1457,6 +1457,7 @@ function switchVersion(ver) {
 function switchType(type) {
   currentType = type;
   lastSelectAll = null;
+  for (const k in scores) delete scores[k];
   document.querySelectorAll('.type-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick').includes(type));
   });
