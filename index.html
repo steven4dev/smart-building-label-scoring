@@ -290,16 +290,19 @@
   /* Score items */
   .score-item {
     display: flex;
-    flex-direction: column;
     padding: 10px 16px;
-    gap: 6px;
     border-bottom: 1px solid var(--bg3);
     transition: background 0.1s;
   }
   .score-item:hover { background: rgba(88,166,255,0.04); }
   .score-item:last-child { border-bottom: none; }
 
-  .item-content { }
+  /* check items: horizontal (checkbox | label | pts) */
+  .score-item.is-check { flex-direction: row; align-items: flex-start; gap: 8px; }
+  /* tier items: vertical (label on top, buttons below) */
+  .score-item.is-tier { flex-direction: column; gap: 6px; }
+
+  .item-content { flex: 1; min-width: 0; }
   .item-label { font-size: 13px; color: var(--text); }
   .item-note { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
@@ -315,6 +318,8 @@
     width: 16px; height: 16px;
     accent-color: var(--accent);
     cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
     flex-shrink: 0;
   }
 
@@ -1366,16 +1371,26 @@ function renderItem(item) {
     ptsText = curScore > 0 ? `+${curScore}分` : `0分`;
   }
 
-  el.innerHTML = `
-    <div class="item-content">
-      <div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}</div>
-      ${item.note ? `<div class="item-note">${item.note}</div>` : ''}
-    </div>
-    <div class="item-bottom">
-      <div class="item-controls">${controlHtml}</div>
-      <div class="item-pts${curScore > 0 ? ' active' : ''}" id="pts_${item.id}">${ptsText}</div>
-    </div>
-  `;
+  const labelHtml = `<div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}</div>${item.note ? `<div class="item-note">${item.note}</div>` : ''}`;
+  const ptsHtml = `<div class="item-pts${curScore > 0 ? ' active' : ''}" id="pts_${item.id}">${ptsText}</div>`;
+
+  if (item.type === 'check') {
+    el.classList.add('is-check');
+    el.innerHTML = `
+      ${controlHtml}
+      <div class="item-content">${labelHtml}</div>
+      ${ptsHtml}
+    `;
+  } else {
+    el.classList.add('is-tier');
+    el.innerHTML = `
+      <div class="item-content">${labelHtml}</div>
+      <div class="item-bottom">
+        <div class="item-controls">${controlHtml}</div>
+        ${ptsHtml}
+      </div>
+    `;
+  }
 
   return el;
 }
