@@ -102,24 +102,25 @@
     display: flex;
     background: var(--bg4);
     border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2px;
+    border-radius: 20px;
+    padding: 3px;
     gap: 2px;
   }
   .type-btn {
-    padding: 4px 14px;
-    border-radius: 12px;
+    padding: 6px 16px;
+    border-radius: 16px;
     border: none;
     background: transparent;
     color: var(--text2);
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.25s ease;
   }
   .type-btn.active {
-    background: var(--bg3);
-    color: var(--text);
-    border: 1px solid var(--border);
+    background: var(--accent2);
+    color: #fff;
+    box-shadow: 0 1px 6px rgba(31,111,235,0.4);
   }
 
   /* ===== SCORE PANEL ===== */
