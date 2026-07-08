@@ -195,9 +195,9 @@
   /* Level thresholds display */
   .threshold-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     padding: 8px 0 0;
-    overflow-x: auto;
     grid-column: 1 / -1;
   }
   .threshold-chip {
@@ -364,14 +364,19 @@
   .select-all-btn {
     padding: 5px 14px;
     border-radius: 6px;
-    border: 1px solid var(--accent);
-    background: rgba(88,166,255,0.1);
-    color: var(--accent);
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text2);
     font-size: 12px;
     cursor: pointer;
     transition: all 0.15s;
   }
-  .select-all-btn:hover { background: rgba(88,166,255,0.2); }
+  .select-all-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .select-all-btn.active {
+    border-color: var(--accent);
+    background: rgba(88,166,255,0.15);
+    color: var(--accent);
+  }
 
   /* Color codes per indicator */
   .c1 { background: rgba(56,139,253,0.15); }
@@ -1071,6 +1076,7 @@ const VERSION_2024 = {
 let currentVersion = '2016';
 let currentType = 'office'; // office, residential, commercial
 const scores = {}; // { itemId: value }
+let lastSelectAll = null; // null=none, false=不含加分, true=全加分
 
 function getVersionData() {
   return currentVersion === '2016' ? VERSION_2016 : VERSION_2024;
@@ -1191,7 +1197,7 @@ function updateScores() {
   for (const l of data.levels) {
     const chip = document.createElement('div');
     chip.className = 'threshold-chip ' + l.tcls + (total >= l.min ? ' reached' : '');
-    chip.textContent = `${l.icon || ''} ${l.name} ≥${l.min}分`;
+    chip.textContent = `${l.name} ≥${l.min}分`;
     row.appendChild(chip);
   }
   // 2016: append 合格 chip (not score-based)
@@ -1258,6 +1264,10 @@ function renderContent() {
     <button class="select-all-btn" onclick="selectAll(true)">☑ 全勾選（全加分）</button>
     <button class="reset-btn" onclick="resetAll()">🔄 清除全部</button>
   `;
+  // restore active state after re-render
+  const btns = toolbar.querySelectorAll('.select-all-btn');
+  if (lastSelectAll === false) btns[0].classList.add('active');
+  else if (lastSelectAll === true) btns[1].classList.add('active');
   container.appendChild(toolbar);
 
   for (const ind of data.indicators) {
@@ -1435,6 +1445,7 @@ function toggleIndicator(indId) {
 
 function switchVersion(ver) {
   currentVersion = ver;
+  lastSelectAll = null;
   document.querySelectorAll('.version-btn').forEach(b => {
     b.classList.toggle('active', b.textContent === ver + '版');
   });
@@ -1445,6 +1456,7 @@ function switchVersion(ver) {
 
 function switchType(type) {
   currentType = type;
+  lastSelectAll = null;
   document.querySelectorAll('.type-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick').includes(type));
   });
@@ -1452,11 +1464,13 @@ function switchType(type) {
 }
 
 function resetAll() {
+  lastSelectAll = null;
   for (const k in scores) delete scores[k];
   renderContent();
 }
 
 function selectAll(includeMaxTier) {
+  lastSelectAll = includeMaxTier;
   const data = getVersionData();
   for (const ind of data.indicators) {
     for (const sub of ind.subcats) {
