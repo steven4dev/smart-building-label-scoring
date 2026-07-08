@@ -1152,8 +1152,11 @@ function updateScores() {
 
   // Update circle
   document.getElementById('totalScore').textContent = total;
-  document.getElementById('maxScoreLabel').textContent = `/ ${data.maxScore}分`;
-  const pct = total / data.maxScore;
+  const maxScore = currentVersion === '2016'
+    ? data.indicators.reduce((s, ind) => s + (ind.maxByType[currentType] || 0), 0)
+    : data.maxScore;
+  document.getElementById('maxScoreLabel').textContent = `/ ${maxScore}分`;
+  const pct = total / maxScore;
   const circ = 264;
   const arc = document.getElementById('scoreArc');
   arc.style.strokeDashoffset = circ * (1 - pct);
@@ -1472,6 +1475,7 @@ function resetAll() {
 
 function selectAll(includeMaxTier) {
   lastSelectAll = includeMaxTier;
+  for (const k in scores) delete scores[k]; // 每次先全清，確保切換時分數準確
   const data = getVersionData();
   for (const ind of data.indicators) {
     for (const sub of ind.subcats) {
