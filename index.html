@@ -40,10 +40,14 @@
   .header {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
-    padding: 16px 20px;
     position: sticky;
     top: 0;
     z-index: 100;
+  }
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 16px 20px;
   }
   .header-top {
     display: flex;
@@ -136,16 +140,20 @@
 
   /* ===== SCORE PANEL ===== */
   .score-panel {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    gap: 16px;
-    align-items: center;
-    padding: 16px 20px;
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
     position: sticky;
     top: var(--header-height, 0);
     z-index: 99;
+  }
+  .score-panel-inner {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
   }
   .score-circle {
     position: relative;
@@ -455,7 +463,7 @@
   }
 
   @media (max-width: 600px) {
-    .score-panel { grid-template-columns: 1fr; }
+    .score-panel-inner { grid-template-columns: 1fr; }
     .ind-bars { display: none; }
     .score-circle { margin: 0 auto; }
   }
@@ -464,6 +472,7 @@
 <body>
 
 <div class="header">
+<div class="header-inner">
   <div class="header-top">
     <h1>🏢 智慧建築評估 <span>計分工具</span></h1>
     <div class="version-toggle" id="versionToggle">
@@ -482,9 +491,11 @@
     </div>
   </div>
 </div>
+</div>
 
 <!-- Score panel -->
 <div class="score-panel">
+<div class="score-panel-inner">
   <div class="score-circle">
     <svg width="100" height="100" viewBox="0 0 100 100">
       <circle cx="50" cy="50" r="42" fill="none" stroke="#21262d" stroke-width="8"/>
@@ -509,6 +520,7 @@
 
   <div class="ind-bars" id="indBarsPanel"></div>
   <div class="threshold-row" id="thresholdRow"></div>
+</div>
 </div>
 
 <div class="content" id="mainContent"></div>
