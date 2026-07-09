@@ -392,6 +392,8 @@
   .toolbar {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
     gap: 8px;
     padding: 8px 0 4px;
   }
@@ -460,6 +462,35 @@
     color: var(--text3);
     font-size: 10px;
     margin-left: 4px;
+  }
+
+  /* Easy item indicator */
+  .easy-chip {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: rgba(63,185,80,0.12);
+    color: var(--green);
+    border: 1px solid rgba(63,185,80,0.3);
+    font-size: 10px;
+    margin-left: 4px;
+    font-weight: 600;
+  }
+  .select-easy-btn {
+    padding: 5px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(63,185,80,0.4);
+    background: transparent;
+    color: var(--green);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .select-easy-btn:hover { border-color: var(--green); background: rgba(63,185,80,0.1); }
+  .select-easy-btn.active {
+    border-color: var(--green);
+    background: rgba(63,185,80,0.15);
+    color: var(--green);
   }
 
   @media (max-width: 600px) {
@@ -1113,7 +1144,7 @@ const VERSION_2024 = {
           id: 's6_5', label: '6.5 智慧管理雲平台（最高8分）',
           maxByType: { office: 8, residential: 8, commercial: 8 },
           items: [
-            { id: 'i6_5_1', label: '採用智慧管理雲平台作為建物管理平台並開發智慧應用', note: '3分=採用雲平台且資料定時匯入、5分=另於政府雲平台開發1項以上智慧應用（AI分析/預測演算/降低營運成本等）', type: 'tier', tiers: [0,3,5] },
+            { id: 'i6_5_1', label: '採用智慧管理雲平台作為建物管理平台並開發智慧應用', note: '3分=採用雲平台且資料定時匯入、8分=另於政府雲平台開發1項以上智慧應用（AI分析/預測演算/降低營運成本等，累積3+5=8分）', type: 'tier', tiers: [0,3,8] },
           ]
         },
       ]
@@ -1122,12 +1153,90 @@ const VERSION_2024 = {
 };
 
 // ============================================================
+// AI建議取分項目（true=check項目勾選、數字=tier建議取分值）
+// 來源：依據智慧建築產業顧問資料，「安全防災指標最容易取分，IoT基礎設施最難」
+// ============================================================
+const EASY_2016 = {
+  // 指標1 綜合佈線
+  'i1_1_3': true,   // 主體佈線採光纖化
+  'i1_1_5': true,   // 水平/工作區同一等級線纜
+  'i1_2_3': 1,      // 支援控管系統（1/7）
+  'i1_2_4': 1,      // 支援智慧服務（1/7）
+  'i1_3_1': true,   // Cat 6以上
+  'i1_3_2': 2,      // 傳輸速率（1Gbps）
+  'i1_4_2': 1,      // 竣工測試報告（資訊佈線）
+  // 指標2 資訊通信
+  'i2_3_1': true,   // 公共無線區域網路
+  'i2_3_2': true,   // 中文圖形化介面
+  'i2_3_3': true,   // 遠端監控操作
+  'i2_6_1': true,   // 公共資訊顯示設備
+  'i2_6_2': true,   // 緊急訊息顯示
+  // 指標3 系統整合
+  'i3_3_3': true,   // 防盜保全連動
+  'i3_3_4': true,   // 門禁系統連動
+  'i3_3_5': true,   // 監視攝影連動
+  'i3_4_2': true,   // 影像攝影Web化
+  // 指標4 設施管理
+  'i4_2_1': 1,      // 使用機能需求規劃（規範文件）
+  'i4_2_2': 1,      // 管理績效評估標準（規範文件）
+  'i4_2_3': 1,      // 決策支援系統（彙整報表）
+  'i4_4_1': 1,      // 設施設備管理維護規範
+  'i4_5_1': 1,      // 長期修繕計畫
+  // 指標5 安全防災
+  'i5_1_3': true,   // 聲響避難方向指示燈
+  'i5_1_4': true,   // 防火系統故障警報
+  'i5_2_1': true,   // 漏水警告設備
+  'i5_2_2': true,   // 淹水偵測設備
+  'i5_3_1': 1,      // 遠端遙控門禁
+  'i5_4_1': true,   // 停車場行車信號/車位狀態
+  'i5_4_2': true,   // 車牌自動識別
+  'i5_5_4': true,   // 緊急求助樓層顯示
+  'i5_5_7': true,   // 地震自動關閉瓦斯
+  // 指標6 節能管理
+  'i6_1_1': true,   // 設備運轉狀態監視
+  'i6_2_2': 1,      // 節能標章燈具（螢光燈）
+  'i6_3_3': 1,      // 照明智慧化（時程控制）
+  // 指標7 健康舒適
+  'i7_1_1': true,   // 天花板淨高 > 2.7m
+  'i7_1_2': true,   // 室內溫度偵測連動空調
+  // 指標8 智慧創新
+  'i8_1_1': true,   // 智慧建築標準符號
+};
+
+const EASY_2024 = {
+  // 指標1 基礎設施
+  'i1_1_4': true,   // 無線區域網路（Wi-Fi）
+  'i1_2_2': 1,      // 佈線系統竣工檢測報告
+  'i1_3_3': 1,      // 備援機制（數據庫備援）
+  'i1_3_4': 1,      // 資訊安全（防火牆）
+  // 指標2 維運管理
+  'i2_1_3': 1,      // 平台管理計畫（異常預警通知）
+  // 指標3 安全防災（最容易取分的指標）
+  'i3_1_1_5': true, // 漏水偵知
+  'i3_1_2_1': 1,    // 災害告警顯示（1種）
+  'i3_1_2_2': 1,    // 連動設備狀態顯示（2種）
+  'i3_1_3_2': true, // 消防系統與空調整合連動
+  'i3_2_1_2': true, // 語音對講整合行動通訊
+  'i3_2_2_2': true, // 防盜警報行動通訊告警
+  'i3_2_4_2': true, // 排除有害氣體功能
+  // 指標4 節能管理
+  'i4_1_4': true,   // 電壓降不超過3%
+  'i4_2_3_lighting': 1, // 照明智慧化（時程控制）
+  // 指標5 健康舒適
+  'i5_1_1_2': 1,    // 空氣品質偵知（PM2.5/TVOC）
+  'i5_2_1_4': true, // 非接觸性設備（聲控/掃描辨識）
+  // 指標6 智慧創新（加分項目，建議全取）
+  'i6_4_1': true,   // 採用標準資料格式 TAICS TS-0054
+  'i6_5_1': 8,      // 智慧管理雲平台 + 智慧應用（3+5=8分）
+};
+
+// ============================================================
 // STATE
 // ============================================================
 let currentVersion = '2016';
 let currentType = 'office'; // office, residential, commercial
 const scores = {}; // { itemId: value }
-let lastSelectAll = null; // null=none, false=不含加分, true=全加分
+let lastSelectAll = null; // null=none, false=不含加分, true=全加分, 'easy'=AI建議
 
 function getVersionData() {
   return currentVersion === '2016' ? VERSION_2016 : VERSION_2024;
@@ -1322,6 +1431,7 @@ function renderContent(animClass) {
   toolbar.innerHTML = `
     <button class="reset-btn" id="toggleExpandBtn" onclick="toggleExpand()">⊞ 全展開</button>
     <span style="flex:1"></span>
+    <button class="select-easy-btn" onclick="selectEasy()">💡 AI建議取分</button>
     <button class="select-all-btn" onclick="selectAll(false)">☑ 全勾選（不含加分）</button>
     <button class="select-all-btn" onclick="selectAll(true)">☑ 全勾選（全加分）</button>
     <button class="reset-btn" onclick="resetAll()">🔄 清除全部</button>
@@ -1330,6 +1440,7 @@ function renderContent(animClass) {
   const btns = toolbar.querySelectorAll('.select-all-btn');
   if (lastSelectAll === false) btns[0].classList.add('active');
   else if (lastSelectAll === true) btns[1].classList.add('active');
+  else if (lastSelectAll === 'easy') toolbar.querySelector('.select-easy-btn').classList.add('active');
   container.appendChild(toolbar);
 
   for (const ind of data.indicators) {
@@ -1417,7 +1528,10 @@ function renderItem(item) {
     ptsText = curScore > 0 ? `+${curScore}分` : `0分`;
   }
 
-  const labelHtml = `<div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}</div>${item.note ? `<div class="item-note">${item.note}</div>` : ''}`;
+  const easyMap = currentVersion === '2016' ? EASY_2016 : EASY_2024;
+  const isEasy = item.id in easyMap;
+  const easyTag = isEasy && !isNA ? '<span class="easy-chip">💡 AI建議</span>' : '';
+  const labelHtml = `<div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}${easyTag}</div>${item.note ? `<div class="item-note">${item.note}</div>` : ''}`;
   const ptsHtml = `<div class="item-pts${curScore > 0 ? ' active' : ''}" id="pts_${item.id}">${ptsText}</div>`;
 
   if (item.type === 'check') {
@@ -1593,6 +1707,27 @@ function selectAll(includeMaxTier) {
         } else if (item.type === 'tier' && includeMaxTier) {
           const tiers = item.tierByType ? (item.tierByType[currentType] || item.tiers) : item.tiers;
           scores[item.id] = tiers[tiers.length - 1];
+        }
+      }
+    }
+  }
+  renderContent();
+}
+
+function selectEasy() {
+  lastSelectAll = 'easy';
+  for (const k in scores) delete scores[k];
+  const data = getVersionData();
+  const easyMap = currentVersion === '2016' ? EASY_2016 : EASY_2024;
+  for (const ind of data.indicators) {
+    for (const sub of ind.subcats) {
+      for (const item of sub.items) {
+        if (item.naTypes && item.naTypes.includes(currentType)) continue;
+        const easyVal = easyMap[item.id];
+        if (easyVal === true && item.type === 'check') {
+          scores[item.id] = item.pts;
+        } else if (typeof easyVal === 'number' && item.type === 'tier') {
+          scores[item.id] = easyVal;
         }
       }
     }
