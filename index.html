@@ -70,6 +70,7 @@
     border-radius: 20px;
     padding: 3px;
     gap: 2px;
+    position: relative;
   }
   .version-btn {
     padding: 6px 20px;
@@ -80,13 +81,11 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: color 0.25s ease;
+    position: relative;
+    z-index: 1;
   }
-  .version-btn.active {
-    background: var(--accent2);
-    color: #fff;
-    box-shadow: 0 1px 6px rgba(31,111,235,0.4);
-  }
+  .version-btn.active { color: #fff; }
 
   /* Building type toggle (2016 only) */
   .type-bar {
@@ -105,6 +104,7 @@
     border-radius: 20px;
     padding: 3px;
     gap: 2px;
+    position: relative;
   }
   .type-btn {
     padding: 6px 16px;
@@ -115,12 +115,23 @@
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.25s ease;
+    transition: color 0.25s ease;
+    position: relative;
+    z-index: 1;
   }
-  .type-btn.active {
+  .type-btn.active { color: #fff; }
+
+  /* Sliding pill shared by both toggles */
+  .toggle-pill {
+    position: absolute;
+    top: 3px; bottom: 3px;
+    border-radius: 16px;
     background: var(--accent2);
-    color: #fff;
     box-shadow: 0 1px 6px rgba(31,111,235,0.4);
+    transition: left 0.28s cubic-bezier(0.4,0,0.2,1),
+                width 0.28s cubic-bezier(0.4,0,0.2,1);
+    pointer-events: none;
+    z-index: 0;
   }
 
   /* ===== SCORE PANEL ===== */
@@ -455,14 +466,16 @@
 <div class="header">
   <div class="header-top">
     <h1>🏢 智慧建築評估 <span>計分工具</span></h1>
-    <div class="version-toggle">
+    <div class="version-toggle" id="versionToggle">
+      <span class="toggle-pill" id="versionPill"></span>
       <button class="version-btn active" onclick="switchVersion('2016')">2016版</button>
       <button class="version-btn" onclick="switchVersion('2024')">2024版</button>
     </div>
   </div>
   <div class="type-bar visible" id="typeBar">
     <span class="type-label">建築類別：</span>
-    <div class="type-toggle">
+    <div class="type-toggle" id="typeToggle">
+      <span class="toggle-pill" id="typePill"></span>
       <button class="type-btn active" onclick="switchType('office')">辦公服務類</button>
       <button class="type-btn" onclick="switchType('residential')">住宿類</button>
       <button class="type-btn" onclick="switchType('commercial')">商業類</button>
@@ -1518,6 +1531,13 @@ function toggleIndicator(indId) {
   }
 }
 
+function slidePill(pillId, activeBtn) {
+  const pill = document.getElementById(pillId);
+  if (!pill || !activeBtn) return;
+  pill.style.left = activeBtn.offsetLeft + 'px';
+  pill.style.width = activeBtn.offsetWidth + 'px';
+}
+
 function switchVersion(ver) {
   const anim = ver === '2024' ? 'anim-right' : 'anim-left';
   currentVersion = ver;
@@ -1525,6 +1545,7 @@ function switchVersion(ver) {
   document.querySelectorAll('.version-btn').forEach(b => {
     b.classList.toggle('active', b.textContent === ver + '版');
   });
+  slidePill('versionPill', document.querySelector('.version-btn.active'));
   const typeBar = document.getElementById('typeBar');
   typeBar.classList.toggle('visible', ver === '2016');
   renderContent(anim);
@@ -1537,6 +1558,7 @@ function switchType(type) {
   document.querySelectorAll('.type-btn').forEach(b => {
     b.classList.toggle('active', b.getAttribute('onclick').includes(type));
   });
+  slidePill('typePill', document.querySelector('.type-btn.active'));
   renderContent('anim-up');
 }
 
@@ -1568,6 +1590,18 @@ function selectAll(includeMaxTier) {
 
 // Init
 renderContent();
+// Init pills (no transition on first render)
+requestAnimationFrame(() => {
+  const vPill = document.getElementById('versionPill');
+  if (vPill) vPill.style.transition = 'none';
+  slidePill('versionPill', document.querySelector('.version-btn.active'));
+  slidePill('typePill', document.querySelector('.type-btn.active'));
+  requestAnimationFrame(() => {
+    if (vPill) vPill.style.transition = '';
+    const tPill = document.getElementById('typePill');
+    if (tPill) tPill.style.transition = '';
+  });
+});
 
 // Set --header-height so score-panel sticks right below the header
 function updateHeaderHeight() {
