@@ -146,6 +146,51 @@
     top: var(--header-height, 0);
     z-index: 99;
   }
+
+  /* Panel collapse button */
+  .panel-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .panel-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Panel body with collapse animation */
+  .score-panel-body {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+    max-height: 300px;
+    opacity: 1;
+  }
+  .score-panel.collapsed .score-panel-body {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  /* Mini summary bar (shown when collapsed) */
+  .score-mini {
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 48px 7px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+  }
+  .score-panel.collapsed .score-mini { display: flex; }
+  .score-mini-num { font-size: 18px; font-weight: 700; color: var(--text); }
+  .score-mini-slash { font-size: 12px; color: var(--text3); }
+  .score-mini .level-badge { font-size: 12px; padding: 3px 10px; margin: 0; }
+
   .score-panel-inner {
     display: grid;
     grid-template-columns: auto 1fr auto;
@@ -525,33 +570,42 @@
 </div>
 
 <!-- Score panel -->
-<div class="score-panel">
-<div class="score-panel-inner">
-  <div class="score-circle">
-    <svg width="100" height="100" viewBox="0 0 100 100">
-      <circle cx="50" cy="50" r="42" fill="none" stroke="#21262d" stroke-width="8"/>
-      <circle id="scoreArc" cx="50" cy="50" r="42" fill="none" stroke="#58a6ff"
-        stroke-width="8" stroke-linecap="round"
-        stroke-dasharray="264" stroke-dashoffset="264"
-        style="transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease"/>
-    </svg>
-    <div class="score-circle-text">
-      <span class="score-num" id="totalScore">0</span>
-      <span class="score-max" id="maxScoreLabel">/ 200分</span>
+<div class="score-panel" id="scorePanel" style="position:relative">
+  <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折</button>
+  <div class="score-panel-body" id="scorePanelBody">
+    <div class="score-panel-inner">
+      <div class="score-circle">
+        <svg width="100" height="100" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="42" fill="none" stroke="#21262d" stroke-width="8"/>
+          <circle id="scoreArc" cx="50" cy="50" r="42" fill="none" stroke="#58a6ff"
+            stroke-width="8" stroke-linecap="round"
+            stroke-dasharray="264" stroke-dashoffset="264"
+            style="transition: stroke-dashoffset 0.5s ease, stroke 0.3s ease"/>
+        </svg>
+        <div class="score-circle-text">
+          <span class="score-num" id="totalScore">0</span>
+          <span class="score-max" id="maxScoreLabel">/ 200分</span>
+        </div>
+      </div>
+
+      <div class="score-info">
+        <div class="level-badge level-none" id="levelBadge">🔘 尚未達標</div>
+        <div class="next-level" id="nextLevelText">請勾選評估項目以計算總分</div>
+        <div id="passNote2016" style="display:none; margin-top:6px; font-size:11px; color:var(--green); opacity:0.8;">
+          ✅ 合格級 = 符合所有基本規定（不計鼓勵分數，需另行審查）
+        </div>
+      </div>
+
+      <div class="ind-bars" id="indBarsPanel"></div>
+      <div class="threshold-row" id="thresholdRow"></div>
     </div>
   </div>
-
-  <div class="score-info">
-    <div class="level-badge level-none" id="levelBadge">🔘 尚未達標</div>
-    <div class="next-level" id="nextLevelText">請勾選評估項目以計算總分</div>
-    <div id="passNote2016" style="display:none; margin-top:6px; font-size:11px; color:var(--green); opacity:0.8;">
-      ✅ 合格級 = 符合所有基本規定（不計鼓勵分數，需另行審查）
-    </div>
+  <!-- Mini bar (visible when collapsed) -->
+  <div class="score-mini" id="scoreMini">
+    <span class="score-mini-num" id="miniScore">0</span>
+    <span class="score-mini-slash" id="miniMax">/ 200分</span>
+    <div class="level-badge level-none" id="miniBadge">🔘 尚未達標</div>
   </div>
-
-  <div class="ind-bars" id="indBarsPanel"></div>
-  <div class="threshold-row" id="thresholdRow"></div>
-</div>
 </div>
 
 <div class="content" id="mainContent"></div>
@@ -1316,6 +1370,9 @@ function updateScores() {
     ? data.indicators.reduce((s, ind) => s + (ind.maxByType[currentType] || 0), 0)
     : data.maxScore;
   document.getElementById('maxScoreLabel').textContent = `/ ${maxScore}分`;
+  // sync mini bar
+  document.getElementById('miniScore').textContent = total;
+  document.getElementById('miniMax').textContent = `/ ${maxScore}分`;
   const pct = total / maxScore;
   const circ = 264;
   const arc = document.getElementById('scoreArc');
@@ -1333,15 +1390,20 @@ function updateScores() {
 
   // Level badge
   const badge = document.getElementById('levelBadge');
+  const miniBadge = document.getElementById('miniBadge');
   const nextLevelEl = document.getElementById('nextLevelText');
   if (!level) {
     badge.className = 'level-badge level-none';
     badge.textContent = '🔘 尚未達銅級';
+    miniBadge.className = 'level-badge level-none';
+    miniBadge.textContent = '🔘 尚未達銅級';
     const first = data.levels[0];
     nextLevelEl.innerHTML = `距 <span>${first.name}</span> 還需 <span>${first.min - total}</span> 分`;
   } else {
     badge.className = 'level-badge ' + level.cls;
     badge.textContent = level.name;
+    miniBadge.className = 'level-badge ' + level.cls;
+    miniBadge.textContent = level.name;
     const next = getNextLevel(total);
     if (next) {
       nextLevelEl.innerHTML = `距 <span>${next.name}</span> 還需 <span>${next.min - total}</span> 分`;
@@ -1686,6 +1748,13 @@ function switchType(type) {
   });
   slidePill('typePill', document.querySelector('.type-btn.active'));
   renderContent('anim-up');
+}
+
+function togglePanel() {
+  const panel = document.getElementById('scorePanel');
+  const btn = document.getElementById('panelToggleBtn');
+  const collapsed = panel.classList.toggle('collapsed');
+  btn.textContent = collapsed ? '▼ 展開' : '▲ 收折';
 }
 
 function resetAll() {
