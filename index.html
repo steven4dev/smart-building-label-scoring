@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>智慧建築評估計分工具</title>
+<script>
+  // Apply theme before first paint to avoid flash
+  (function(){
+    const saved = localStorage.getItem('sb-theme');
+    const sys = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', saved || sys);
+  })();
+</script>
 <style>
   :root {
     --bg: #0d1117;
@@ -26,6 +34,20 @@
     --silver: #94a3b8;
     --copper: #b87333;
   }
+  /* Light theme overrides */
+  [data-theme="light"] {
+    --bg: #ffffff;
+    --bg2: #f6f8fa;
+    --bg3: #eaeef2;
+    --bg4: #e1e4e8;
+    --border: #d0d7de;
+    --text: #1f2328;
+    --text2: #656d76;
+    --text3: #9198a1;
+    --accent: #0969da;
+    --accent2: #0550ae;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: var(--bg);
@@ -65,6 +87,19 @@
     gap: 8px;
   }
   .header h1 span { color: var(--accent); }
+  .theme-btn {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* iOS-style version toggle */
   .version-toggle {
@@ -556,10 +591,13 @@
 <div class="header-inner">
   <div class="header-top">
     <h1>🏢 智慧建築評估 <span>計分工具</span></h1>
-    <div class="version-toggle" id="versionToggle">
-      <span class="toggle-pill" id="versionPill"></span>
-      <button class="version-btn active" onclick="switchVersion('2016')">2016版</button>
-      <button class="version-btn" onclick="switchVersion('2024')">2024版</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="version-toggle" id="versionToggle">
+        <span class="toggle-pill" id="versionPill"></span>
+        <button class="version-btn active" onclick="switchVersion('2016')">2016版</button>
+        <button class="version-btn" onclick="switchVersion('2024')">2024版</button>
+      </div>
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="切換亮/暗主題">🌙</button>
     </div>
   </div>
   <div class="type-bar visible" id="typeBar">
@@ -1767,6 +1805,26 @@ function togglePanel() {
   // Update toolbar top after collapse/expand animation (0.3s transition)
   setTimeout(updateToolbarTop, 350);
 }
+
+// ── Theme ────────────────────────────────────────────────────
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  const btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = theme === 'dark' ? '🌞' : '🌙';
+}
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = cur === 'dark' ? 'light' : 'dark';
+  localStorage.setItem('sb-theme', next);
+  applyTheme(next);
+}
+// Sync button icon on load and listen for system changes
+(function() {
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'dark');
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('sb-theme')) applyTheme(e.matches ? 'dark' : 'light');
+  });
+})();
 
 function resetAll() {
   lastSelectAll = null;
