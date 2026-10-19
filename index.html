@@ -433,14 +433,20 @@
   }
   .item-pts.active { color: var(--green); }
 
-  /* Toolbar buttons */
+  /* Toolbar buttons — sticky, always visible below the score panel */
   .toolbar {
     display: flex;
     justify-content: flex-end;
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    padding: 8px 0 4px;
+    padding: 6px 20px;
+    margin: -16px -20px 12px;
+    position: sticky;
+    top: var(--toolbar-top, 0px);
+    z-index: 98;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
   }
   .reset-btn {
     padding: 5px 14px;
@@ -1504,6 +1510,8 @@ function renderContent(animClass) {
   else if (lastSelectAll === true) btns[1].classList.add('active');
   else if (lastSelectAll === 'easy') toolbar.querySelector('.select-easy-btn').classList.add('active');
   container.appendChild(toolbar);
+  // Ensure toolbar top is correct after re-render
+  requestAnimationFrame(updateToolbarTop);
 
   for (const ind of data.indicators) {
     const card = document.createElement('div');
@@ -1755,6 +1763,8 @@ function togglePanel() {
   const btn = document.getElementById('panelToggleBtn');
   const collapsed = panel.classList.toggle('collapsed');
   btn.textContent = collapsed ? '▼ 展開' : '▲ 收折';
+  // Update toolbar top after collapse/expand animation (0.3s transition)
+  setTimeout(updateToolbarTop, 350);
 }
 
 function resetAll() {
@@ -1823,7 +1833,17 @@ requestAnimationFrame(() => {
 function updateHeaderHeight() {
   const h = document.querySelector('.header');
   if (h) document.documentElement.style.setProperty('--header-height', h.offsetHeight + 'px');
+  updateToolbarTop();
 }
+
+// Set --toolbar-top so toolbar sticks right below the score panel
+function updateToolbarTop() {
+  const h = document.querySelector('.header');
+  const p = document.getElementById('scorePanel');
+  const top = (h ? h.offsetHeight : 0) + (p ? p.offsetHeight : 0);
+  document.documentElement.style.setProperty('--toolbar-top', top + 'px');
+}
+
 updateHeaderHeight();
 window.addEventListener('resize', updateHeaderHeight);
 </script>
