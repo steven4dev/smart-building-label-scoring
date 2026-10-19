@@ -173,17 +173,19 @@
     opacity: 0;
   }
 
-  /* Mini summary bar (shown when collapsed) */
+  /* Mini summary bar (always visible; score+badge hidden when expanded) */
   .score-mini {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 10px;
-    padding: 7px 48px 7px 20px;
+    padding: 5px 20px;
     max-width: 1100px;
     margin: 0 auto;
-    flex-wrap: wrap;
+    border-top: 1px solid var(--border);
   }
-  .score-panel.collapsed .score-mini { display: flex; }
+  .score-panel:not(.collapsed) .score-mini-num,
+  .score-panel:not(.collapsed) .score-mini-slash,
+  .score-panel:not(.collapsed) .score-mini .level-badge { display: none; }
   .score-mini-num { font-size: 18px; font-weight: 700; color: var(--text); }
   .score-mini-slash { font-size: 12px; color: var(--text3); }
   .score-mini .level-badge { font-size: 12px; padding: 3px 10px; margin: 0; }
@@ -602,11 +604,13 @@
       <div class="threshold-row" id="thresholdRow"></div>
     </div>
   </div>
-  <!-- Mini bar (visible when collapsed) -->
+  <!-- Mini bar (always visible; score+badge only when collapsed) -->
   <div class="score-mini" id="scoreMini">
     <span class="score-mini-num" id="miniScore">0</span>
     <span class="score-mini-slash" id="miniMax">/ 200分</span>
     <div class="level-badge level-none" id="miniBadge">🔘 尚未達標</div>
+    <div style="flex:1"></div>
+    <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折</button>
   </div>
 </div>
 
@@ -1499,7 +1503,6 @@ function renderContent(animClass) {
     <button class="select-all-btn" onclick="selectAll(false)">☑ 全勾選（不含加分）</button>
     <button class="select-all-btn" onclick="selectAll(true)">☑ 全勾選（全加分）</button>
     <button class="reset-btn" onclick="resetAll()">🔄 清除全部</button>
-    <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折</button>
   `;
   // restore active state after re-render
   const btns = toolbar.querySelectorAll('.select-all-btn');
