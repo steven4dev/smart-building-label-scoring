@@ -147,17 +147,14 @@
     z-index: 99;
   }
 
-  /* Panel collapse button */
+  /* Panel collapse button — lives in the toolbar row */
   .panel-toggle-btn {
-    position: absolute;
-    right: 12px;
-    bottom: 8px;
     background: var(--bg4);
     border: 1px solid var(--border);
     color: var(--text2);
     border-radius: 4px;
-    padding: 2px 8px;
-    font-size: 11px;
+    padding: 5px 12px;
+    font-size: 12px;
     cursor: pointer;
     transition: all 0.15s;
     white-space: nowrap;
@@ -577,7 +574,6 @@
 
 <!-- Score panel -->
 <div class="score-panel" id="scorePanel">
-  <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折</button>
   <div class="score-panel-body" id="scorePanelBody">
     <div class="score-panel-inner">
       <div class="score-circle">
@@ -1502,6 +1498,7 @@ function renderContent(animClass) {
     <button class="select-easy-btn" onclick="selectEasy()">💡 AI建議取分</button>
     <button class="select-all-btn" onclick="selectAll(false)">☑ 全勾選（不含加分）</button>
     <button class="select-all-btn" onclick="selectAll(true)">☑ 全勾選（全加分）</button>
+    <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折</button>
     <button class="reset-btn" onclick="resetAll()">🔄 清除全部</button>
   `;
   // restore active state after re-render
