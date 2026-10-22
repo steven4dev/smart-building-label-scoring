@@ -212,6 +212,7 @@
   .score-mini {
     display: flex;
     align-items: center;
+    flex-wrap: nowrap;
     gap: 10px;
     padding: 5px 20px;
     max-width: 1100px;
@@ -438,25 +439,30 @@
     flex-shrink: 0;
   }
 
-  /* Radio-based tiered items */
-  .tier-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .tier-btn {
-    padding: 2px 8px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--bg4);
-    color: var(--text2);
-    font-size: 11px;
+  /* Checkbox-based tiered items */
+  .tier-checks { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+  .tier-check-row { display: flex; align-items: flex-start; gap: 8px; }
+  .tier-check-row input[type="checkbox"] {
+    width: 15px; height: 15px;
+    accent-color: var(--accent);
     cursor: pointer;
-    transition: all 0.15s;
+    flex-shrink: 0;
+    margin-top: 1px;
   }
-  .tier-btn:hover { border-color: var(--accent); color: var(--text); }
-  .tier-btn.selected { background: var(--accent2); color: #fff; border-color: var(--accent); }
-  .tier-btn.tier-0 { opacity: 0.6; }
+  .tier-check-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex: 1;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+  .tier-check-note { color: var(--text2); flex: 1; }
+  .tier-check-pts { color: var(--text3); white-space: nowrap; flex-shrink: 0; }
+  .tier-check-row input:checked ~ .tier-check-label .tier-check-note { color: var(--text); }
+  .tier-check-row input:checked ~ .tier-check-label .tier-check-pts { color: var(--accent); font-weight: 600; }
 
   .item-pts {
     margin-left: auto;
@@ -1335,6 +1341,7 @@ const EASY_2024 = {
 let currentVersion = '2016';
 let currentType = 'office'; // office, residential, commercial
 const scores = {}; // { itemId: value }
+const tierChecks = {}; // { itemId: Set<tierValue> } — which tier checkboxes are checked
 let lastSelectAll = null; // null=none, false=不含加分, true=全加分, 'easy'=AI建議
 
 function getVersionData() {
@@ -1628,12 +1635,21 @@ function renderItem(item) {
     ptsText = `+${pts}分`;
   } else if (item.type === 'tier') {
     const tiers = getTiersForItem(item);
-    let btns = '';
+    const noteMap = parseTierNotes(item.note);
+    const checkedSet = tierChecks[item.id] || new Set();
+    let rows = '';
     for (const t of tiers) {
-      const selected = Number(val) === Number(t);
-      btns += `<button class="tier-btn${selected?' selected':''}${t===0?' tier-0':''}" ${isNA?'disabled':''} onclick="onTier('${item.id}', ${t})">${t === 0 ? '不選' : `+${t}分`}</button>`;
+      if (t === 0) continue;
+      const isChecked = checkedSet.has(t);
+      const noteText = noteMap[t] || '';
+      rows += `<div class="tier-check-row">` +
+        `<input type="checkbox" id="tchk_${item.id}_${t}" ${isChecked ? 'checked' : ''} ${isNA ? 'disabled' : ''} onchange="onTierCheck('${item.id}', ${t}, this.checked)">` +
+        `<label class="tier-check-label" for="tchk_${item.id}_${t}">` +
+        `<span class="tier-check-note">${noteText || `等級 +${t}分`}</span>` +
+        `<span class="tier-check-pts">+${t}分</span>` +
+        `</label></div>`;
     }
-    controlHtml = `<div class="tier-group">${btns}</div>`;
+    controlHtml = `<div class="tier-checks">${rows}</div>`;
     ptsText = curScore > 0 ? `+${curScore}分` : `0分`;
   }
 
@@ -1641,7 +1657,9 @@ function renderItem(item) {
   const isEasy = item.id in easyMap;
   const easyTag = isEasy && !isNA ? '<span class="easy-chip">💡 AI建議</span>' : '';
   const refNum = item.id.replace(/^i/, '').replace(/_/g, '.');
-  const labelHtml = `<div class="item-ref">§ ${refNum}</div><div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}${easyTag}</div>${item.note ? `<div class="item-note">${item.note}</div>` : ''}`;
+  // For tier items, note is parsed into per-tier checkboxes — skip the inline note block
+  const noteBlock = (item.note && item.type !== 'tier') ? `<div class="item-note">${item.note}</div>` : '';
+  const labelHtml = `<div class="item-ref">§ ${refNum}</div><div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}${easyTag}</div>${noteBlock}`;
   const ptsHtml = `<div class="item-pts${curScore > 0 ? ' active' : ''}" id="pts_${item.id}">${ptsText}</div>`;
 
   if (item.type === 'check') {
@@ -1681,19 +1699,13 @@ function refreshItem(item) {
       ptsEl.className = 'item-pts' + (curScore > 0 ? ' active' : '');
     }
   } else {
-    // Re-render tier buttons
+    // Update tier checkboxes
     const tiers = getTiersForItem(item);
-    const group = row.querySelector('.tier-group');
-    if (group) {
-      group.innerHTML = '';
-      for (const t of tiers) {
-        const btn = document.createElement('button');
-        btn.className = 'tier-btn' + (Number(val) === Number(t) ? ' selected' : '') + (t === 0 ? ' tier-0' : '');
-        btn.textContent = t === 0 ? '不選' : `+${t}分`;
-        if (isNA) btn.disabled = true;
-        btn.onclick = () => onTier(item.id, t);
-        group.appendChild(btn);
-      }
+    const checkedSet = tierChecks[item.id] || new Set();
+    for (const t of tiers) {
+      if (t === 0) continue;
+      const chk = document.getElementById('tchk_' + item.id + '_' + t);
+      if (chk) { chk.checked = checkedSet.has(t); chk.disabled = isNA; }
     }
     const ptsEl = document.getElementById('pts_' + item.id);
     if (ptsEl) {
@@ -1712,19 +1724,31 @@ function onCheck(itemId, checked, pts) {
   updateScores();
 }
 
-function onTier(itemId, value) {
-  scores[itemId] = Number(value);
-  // Re-render buttons
-  const data = getVersionData();
-  for (const ind of data.indicators) {
-    for (const sub of ind.subcats) {
-      for (const item of sub.items) {
-        if (item.id === itemId) {
-          refreshItem(item);
-          break;
-        }
-      }
-    }
+// Parse "3分=description、8分=description" note into {3: "desc", 8: "desc"}
+function parseTierNotes(note) {
+  const map = {};
+  if (!note) return map;
+  const parts = note.split(/[、，,；]/);
+  for (const p of parts) {
+    const m = p.match(/^(\d+)\s*分\s*[=＝]\s*([\s\S]+)/);
+    if (m) map[parseInt(m[1])] = m[2].trim();
+  }
+  return map;
+}
+
+function onTierCheck(itemId, tierValue, checked) {
+  if (!tierChecks[itemId]) tierChecks[itemId] = new Set();
+  if (checked) tierChecks[itemId].add(tierValue);
+  else tierChecks[itemId].delete(tierValue);
+  // Score = max of all checked tier values
+  const vals = [...tierChecks[itemId]];
+  scores[itemId] = vals.length > 0 ? Math.max(...vals) : 0;
+  // Update pts display
+  const curScore = scores[itemId];
+  const ptsEl = document.getElementById('pts_' + itemId);
+  if (ptsEl) {
+    ptsEl.textContent = curScore > 0 ? `+${curScore}分` : '0分';
+    ptsEl.className = 'item-pts' + (curScore > 0 ? ' active' : '');
   }
   updateScores();
 }
@@ -1831,12 +1855,14 @@ function toggleTheme() {
 function resetAll() {
   lastSelectAll = null;
   for (const k in scores) delete scores[k];
+  for (const k in tierChecks) delete tierChecks[k];
   renderContent();
 }
 
 function selectAll(includeMaxTier) {
   lastSelectAll = includeMaxTier;
   for (const k in scores) delete scores[k]; // 每次先全清，確保切換時分數準確
+  for (const k in tierChecks) delete tierChecks[k];
   const data = getVersionData();
   for (const ind of data.indicators) {
     for (const sub of ind.subcats) {
@@ -1846,7 +1872,9 @@ function selectAll(includeMaxTier) {
           scores[item.id] = item.pts;
         } else if (item.type === 'tier' && includeMaxTier) {
           const tiers = item.tierByType ? (item.tierByType[currentType] || item.tiers) : item.tiers;
-          scores[item.id] = tiers[tiers.length - 1];
+          const maxT = tiers[tiers.length - 1];
+          scores[item.id] = maxT;
+          tierChecks[item.id] = new Set(tiers.filter(t => t > 0));
         }
       }
     }
@@ -1857,6 +1885,7 @@ function selectAll(includeMaxTier) {
 function selectEasy() {
   lastSelectAll = 'easy';
   for (const k in scores) delete scores[k];
+  for (const k in tierChecks) delete tierChecks[k];
   const data = getVersionData();
   const easyMap = currentVersion === '2016' ? EASY_2016 : EASY_2024;
   for (const ind of data.indicators) {
@@ -1868,6 +1897,7 @@ function selectEasy() {
           scores[item.id] = item.pts;
         } else if (typeof easyVal === 'number' && item.type === 'tier') {
           scores[item.id] = easyVal;
+          tierChecks[item.id] = new Set([easyVal]);
         }
       }
     }
