@@ -731,8 +731,8 @@ const VERSION_2016 = {
           items: [
             { id: 'i1_2_1', label: '支援進階電信、數位匯流相關服務（VoIP/OTT/視訊等）', type: 'check', pts: 2 },
             { id: 'i1_2_2', label: '支援光纖資通訊相關服務（FTTB/FTTH）', note: '1分=FTTB、2分=FTTH/光纖區域網路', type: 'tier', tiers: [0,1,2] },
-            { id: 'i1_2_3', label: '支援建築物控管系統（電力/空調/照明/給排水/通風/電梯/消防）', note: '1分=1/7、2分=5/7涵蓋率', type: 'tier', tiers: [0,1,2] },
-            { id: 'i1_2_4', label: '支援智慧服務系統（監視/門禁/保全/對講/停車/求救/家庭自動化）', note: '1分=1/7、2分=4/7涵蓋率', type: 'tier', tiers: [0,1,2] },
+            { id: 'i1_2_3', label: '支援建築物控管系統（電力/空調/照明/給排水/通風/電梯/消防）', type: 'count', countTiers: [{count:1,pts:1},{count:5,pts:2}], subitems: [{label:'電力系統'},{label:'空調系統'},{label:'照明系統'},{label:'衛生給排水系統'},{label:'通風系統'},{label:'電梯系統'},{label:'消防系統'}] },
+            { id: 'i1_2_4', label: '支援智慧服務系統（監視/門禁/保全/對講/停車/求救/家庭自動化）', type: 'count', countTiers: [{count:1,pts:1},{count:4,pts:2}], subitems: [{label:'監視攝影系統'},{label:'門禁管理系統'},{label:'保全系統'},{label:'對講系統'},{label:'停車管理系統'},{label:'緊急求救系統'},{label:'家庭自動化系統'}] },
           ]
         },
         {
@@ -874,9 +874,9 @@ const VERSION_2016 = {
         {
           id: 's4_2', label: '4.2 效能管理', maxByType: { office: 11, residential: 11, commercial: 11 },
           items: [
-            { id: 'i4_2_1', label: '預期使用機能需求評估與規劃', note: '1分=使/建照記載、1分=各空間機能配置、1分=未來變更用途配置規範', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i4_2_1', label: '預期使用機能需求評估與規劃', type: 'count', cap: 3, subitems: [{label:'使/建照記載機能需求',pts:1},{label:'各空間機能配置規劃',pts:1},{label:'未來變更用途配置規範',pts:1}] },
             { id: 'i4_2_2', label: '訂定管理績效評估標準（含管制事項/目標/評估方式）', note: '1分=規範文件、1分=應用作業系統', type: 'tier', tiers: [0,1,2] },
-            { id: 'i4_2_3', label: '提供資訊收集/記錄/儲存及傳輸的決策支援系統（各類管理報表）', note: '1分=彙整報表、1分=系統產製/儲存、1分=雲端儲存/備份', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i4_2_3', label: '提供資訊收集/記錄/儲存及傳輸的決策支援系統（各類管理報表）', type: 'count', cap: 3, subitems: [{label:'具備彙整報表功能',pts:1},{label:'由系統產製並儲存報表',pts:1},{label:'雲端儲存及定期備份',pts:1}] },
             { id: 'i4_2_4', label: '訂定品質管理制度（ISO/SOP/各項管理作業流程）', note: '1分=規範文件、1分=單項系統、2分=整合系統', type: 'tier', tiers: [0,1,2,3] },
           ]
         },
@@ -890,7 +890,7 @@ const VERSION_2016 = {
           id: 's4_4', label: '4.4 維運管理', maxByType: { office: 6, residential: 6, commercial: 6 },
           items: [
             { id: 'i4_4_1', label: '訂定各項設施設備管理維護規範（週期/費用/技術規範等）', note: '1分=規範文件、1分=單項系統、2分=整合系統', type: 'tier', tiers: [0,1,2,3] },
-            { id: 'i4_4_2', label: '訂定智慧化設施設備危機處理與緊急應變計畫（資安/當機/駭客）', note: '1分=規範/系統功能、1分=具體防範措施、1分=建置應變設施', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i4_4_2', label: '訂定智慧化設施設備危機處理與緊急應變計畫（資安/當機/駭客）', type: 'count', cap: 3, subitems: [{label:'安全規範文件或系統功能',pts:1},{label:'具體防範措施',pts:1},{label:'建置應變設施',pts:1}] },
           ]
         },
         {
@@ -1133,8 +1133,8 @@ const VERSION_2024 = {
           id: 's1_2', label: '1.2 佈線維運管理（最高9分）',
           maxByType: { office: 9, residential: 9, commercial: 9 },
           items: [
-            { id: 'i1_2_2', label: '佈線系統檢測計畫說明及竣工檢測報告', note: '1分=資訊佈線（含光纖）、1分=無線網路佈線', type: 'tier', tiers: [0,1,2] },
-            { id: 'i1_2_3', label: '佈線系統維運管理計畫', note: '1分=完整計畫、2分=納入維運管理系統可儲存查詢、2分=可於BIM/3D中可視化查詢', type: 'tier', tiers: [0,1,3,5] },
+            { id: 'i1_2_2', label: '佈線系統檢測計畫說明及竣工檢測報告', type: 'count', cap: 2, subitems: [{label:'資訊佈線（含光纖）竣工檢測報告',pts:1},{label:'無線網路佈線竣工檢測報告',pts:1}] },
+            { id: 'i1_2_3', label: '佈線系統維運管理計畫', type: 'count', cap: 5, subitems: [{label:'提出完整維運管理計畫',pts:1},{label:'納入維運管理系統可儲存查詢',pts:2},{label:'可於BIM/3D中可視化查詢',pts:2}] },
             { id: 'i1_2_4', label: '設置電動車輛充電設備並導入電能管理系統', type: 'check', pts: 2 },
           ]
         },
@@ -1142,8 +1142,8 @@ const VERSION_2024 = {
           id: 's1_3', label: '1.3 資料設施（最高17分）',
           maxByType: { office: 17, residential: 17, commercial: 17 },
           items: [
-            { id: 'i1_3_2', label: '建築動態數據庫（蒐集環境/行為/設備運轉等動態數據，採標準資料格式）', note: '1分=5種以上、2分=8種以上、3分=10種以上', type: 'tier', tiers: [0,1,2,3] },
-            { id: 'i1_3_3', label: '備援機制（數據庫備援/網路備援/系統備援）', note: '1分=數據庫備援、2分=網路備援（雙環/雙路由）、3分=系統備援（熱備援/資料回溯）', type: 'tier', tiers: [0,1,2,3,4,5] },
+            { id: 'i1_3_2', label: '建築動態數據庫（蒐集環境/行為/設備運轉等動態數據，採標準資料格式）', type: 'count', countTiers: [{count:5,pts:1},{count:8,pts:2},{count:10,pts:3}], subitems: [{label:'室內溫度'},{label:'室內濕度'},{label:'CO₂濃度'},{label:'PM2.5'},{label:'照度'},{label:'VOC/TVOC'},{label:'用電量'},{label:'用水量'},{label:'人員數/出入紀錄'},{label:'空調運轉狀態'},{label:'昇降機使用狀態'},{label:'停車場使用狀態'},{label:'消防設備狀態'},{label:'太陽輻射/氣象'}] },
+            { id: 'i1_3_3', label: '備援機制（數據庫備援/網路備援/系統備援）', type: 'count', cap: 5, subitems: [{label:'建築數據庫備援（非同棟或不同系統）',pts:1},{label:'網路備援（雙環/雙路由/其他拓樸）',pts:2},{label:'系統備援（熱備援/資料存取不中斷）',pts:3}] },
             { id: 'i1_3_4', label: '資訊安全（各項1分，最高5分）', type: 'count', cap: 5,
               subitems: [
                 { label: '對外網路防火牆/防毒軟體機制（如：網頁防護、防毒掃描或入侵偵測）' },
@@ -1154,7 +1154,7 @@ const VERSION_2024 = {
                 { label: '資訊安全相關設備具軟體更新功能（如：防毒軟體）' },
               ]
             },
-            { id: 'i1_3_5', label: '區塊鏈加密機制（保全/門禁/緊急對講/監視攝影/主機登入紀錄等）', note: '2分=儲存2類資料、4分=儲存3類以上', type: 'tier', tiers: [0,2,4] },
+            { id: 'i1_3_5', label: '區塊鏈加密機制（保全/門禁/緊急對講/監視攝影/主機登入紀錄等）', type: 'count', countTiers: [{count:2,pts:2},{count:3,pts:4}], subitems: [{label:'保全系統'},{label:'門禁管理系統'},{label:'緊急對講系統'},{label:'監視攝影系統'},{label:'主機登入紀錄'},{label:'系統存取資訊'},{label:'系統操作紀錄'}] },
           ]
         },
       ]
@@ -1168,8 +1168,8 @@ const VERSION_2024 = {
           maxByType: { office: 15, residential: 15, commercial: 15 },
           items: [
             { id: 'i2_1_2', label: '智慧化系統需求與設計（跨系統整合之具體互動關聯性作為）', note: '2分=1項、4分=2項、6分=3項跨系統整合互動', type: 'tier', tiers: [0,2,4,6] },
-            { id: 'i2_1_3', label: '平台管理計畫（運轉資訊異常預警通知 + 網路資訊異常警示）', note: '1分=運轉資訊異常預警、1分=網路資訊異常警示', type: 'tier', tiers: [0,1,2] },
-            { id: 'i2_1_5', label: '維運管理計畫（WEB化維運系統 + 5年修繕計畫 + 危機應變計畫）', note: '3分=WEB化維運系統、2分=5年修繕計畫+WEB化、2分=危機處理與緊急應變計畫', type: 'tier', tiers: [0,2,4,7] },
+            { id: 'i2_1_3', label: '平台管理計畫（運轉資訊異常預警通知 + 網路資訊異常警示）', type: 'count', cap: 2, subitems: [{label:'運轉資訊異常預警通知',pts:1},{label:'網路資訊異常警示',pts:1}] },
+            { id: 'i2_1_5', label: '維運管理計畫（WEB化維運系統 + 5年修繕計畫 + 危機應變計畫）', type: 'count', cap: 7, subitems: [{label:'WEB化維運系統',pts:3},{label:'5年修繕計畫（需WEB化維運系統）',pts:2},{label:'危機處理與緊急應變計畫',pts:2}] },
           ]
         },
         {
@@ -1204,8 +1204,8 @@ const VERSION_2024 = {
             { id: 'i3_1_1_4', label: '火警告警進階版（長時間監測室內溫度記錄判斷異常達到告警功能）', type: 'check', pts: 3 },
             { id: 'i3_1_1_5', label: '漏水偵知（設置漏水感測器整合至智慧建築管理平台）', type: 'check', pts: 1 },
             { id: 'i3_1_1_6', label: '地震偵知（設置地震感測器整合至智慧建築管理平台）', type: 'check', pts: 2 },
-            { id: 'i3_1_2_1', label: '災害告警顯示（於公共空間顯示裝置提供火警/水災/地震/用電異常等訊息）', note: '1分=1種、2分=2種、3分=3種、4分=4種以上災害', type: 'tier', tiers: [0,1,2,3,4] },
-            { id: 'i3_1_2_2', label: '連動設備狀態顯示（顯示昇降機/門禁/排風機/空調/防水/自動斷電等狀態）', note: '1分=2種、2分=3種、3分=4種、4分=5種以上', type: 'tier', tiers: [0,1,2,3,4] },
+            { id: 'i3_1_2_1', label: '災害告警顯示（於公共空間顯示裝置提供火警/水災/地震/用電異常等訊息）', type: 'count', countTiers: [{count:1,pts:1},{count:2,pts:2},{count:3,pts:3},{count:4,pts:4}], subitems: [{label:'火警告警'},{label:'水災告警'},{label:'地震告警'},{label:'用電異常告警'}] },
+            { id: 'i3_1_2_2', label: '連動設備狀態顯示（顯示昇降機/門禁/排風機/空調/防水/自動斷電等狀態）', type: 'count', countTiers: [{count:2,pts:1},{count:3,pts:2},{count:4,pts:3},{count:5,pts:4}], subitems: [{label:'昇降機'},{label:'門禁'},{label:'排風機'},{label:'空調'},{label:'防水設備'},{label:'自動斷電'}] },
             { id: 'i3_1_3_2', label: '消防系統與空調及地下室送排風設備整合連動', type: 'check', pts: 1 },
             { id: 'i3_1_3_3', label: '用電異常自動斷電功能並整合至智慧建築管理平台', type: 'check', pts: 3 },
             { id: 'i3_1_3_4', label: '火災發生後系統具備自動引導人員避難功能（閃滅型/聲響型/動態避難引導設備）', type: 'check', pts: 3 },
@@ -1244,12 +1244,12 @@ const VERSION_2024 = {
           id: 's4_2', label: '4.2 節能技術（最高22分）',
           maxByType: { office: 22, residential: 22, commercial: 22 },
           items: [
-            { id: 'i4_2_1', label: '建築外層智慧化節能（智慧遮陽/智慧開口調節/BIPV）', note: '1分=智慧遮陽、1分=智慧開口調節、1分=BIPV或追日型創能措施', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i4_2_1', label: '建築外層智慧化節能（智慧遮陽/智慧開口調節/BIPV）', type: 'count', cap: 3, subitems: [{label:'智慧遮陽',pts:1},{label:'智慧開口調節',pts:1},{label:'BIPV或追日型創能措施',pts:1}] },
             { id: 'i4_2_2', label: '空調系統智慧化節能（依節能技術積分表累加）', note: '1分=積分≥30、2分=積分≥35、3分=積分≥40、4分=積分≥45（採用率≥50%）', type: 'tier', tiers: [0,1,2,3,4] },
-            { id: 'i4_2_3_lighting', label: '照明智慧化節能（晝光利用/時程控制/人感/情境/調光/App等）', note: '每項1分，最高4分（場域≥20%或特定場域全面採用）', type: 'tier', tiers: [0,1,2,3,4] },
+            { id: 'i4_2_3_lighting', label: '照明智慧化節能（晝光利用/時程控制/人感/情境/調光/App等）', type: 'count', cap: 4, subitems: [{label:'時程控制',pts:1},{label:'人員感知控制',pts:1},{label:'晝光利用',pts:1},{label:'情境模式控制',pts:1},{label:'調光控制',pts:1},{label:'App/ICT雲端管理',pts:1}] },
             { id: 'i4_2_3_outlet', label: '插座智慧化節能（時程控制/智慧化插座）', note: '1分=插座數量≥20%具智慧化、2分=≥40%', type: 'tier', tiers: [0,1,2] },
             { id: 'i4_2_4', label: '動力設施智慧化節能（給排水/生活熱水/停車場排風/排氣/昇降機等）', note: '1分=功率占比≥20%、2分=≥30%、3分=≥40%、4分=≥50%', type: 'tier', tiers: [0,1,2,3,4] },
-            { id: 'i4_2_6', label: '水資源流向監測與管理（繪製水平衡圖，設置智慧水表）', note: '1分=空調冷凝水或雨水回收設智慧水表、1分=景觀或中央空調補水設智慧水表', type: 'tier', tiers: [0,1,2] },
+            { id: 'i4_2_6', label: '水資源流向監測與管理（繪製水平衡圖，設置智慧水表）', type: 'count', cap: 2, subitems: [{label:'空調冷凝水或雨水回收設智慧水表',pts:1},{label:'景觀或中央空調補水設智慧水表',pts:1}] },
             { id: 'i4_2_7', label: '綠能技術（太陽光電/風力/小水力等，並具備監視或儲能控制）', note: '1分=總裝置容量≥4kW、2分=≥16kW、3分=≥32kW', type: 'tier', tiers: [0,1,2,3] },
           ]
         },
@@ -1264,10 +1264,10 @@ const VERSION_2024 = {
                 { label: '氣冷式主機偵知入風溫度並記錄運轉偏差率' },
               ]
             },
-            { id: 'i4_3_3', label: '智慧需量控制（用電設施卸載/儲能/創能控制 + AI機器學習）', note: '1分=卸載/儲能/創能管理、1分=導入AI機器學習深度學習', type: 'tier', tiers: [0,1,2] },
-            { id: 'i4_3_4', label: '用電資訊視覺化顯示（插座/昇降/給排水/停車場/廚房熱水等分項用電）', note: '每具備2項可得1分，最高3分（採用率≥80%）', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i4_3_3', label: '智慧需量控制（用電設施卸載/儲能/創能控制 + AI機器學習）', type: 'count', cap: 2, subitems: [{label:'用電設施卸載/儲能/創能管理',pts:1},{label:'導入AI機器學習/深度學習',pts:1}] },
+            { id: 'i4_3_4', label: '用電資訊視覺化顯示（插座/昇降/給排水/停車場/廚房熱水等分項用電）', type: 'count', countTiers: [{count:2,pts:1},{count:4,pts:2},{count:6,pts:3}], subitems: [{label:'照明用電'},{label:'插座用電'},{label:'昇降機用電'},{label:'給排水用電'},{label:'停車場用電'},{label:'廚房熱水用電'}] },
             { id: 'i4_3_5', label: '智慧用電管理（AI/神經網路/機器學習整合空調/照明/給排水/昇降機等）', note: '3分=整合2項以上、6分=整合4項以上、8分=整合6項以上', type: 'tier', tiers: [0,3,6,8] },
-            { id: 'i4_3_6', label: '能源流向有效管理（依能源績效指標規劃能源分攤機制並持續追蹤稽核）', note: '1分=能源分攤機制、1分=連續紀錄/分析追蹤/外部稽核', type: 'tier', tiers: [0,1,2] },
+            { id: 'i4_3_6', label: '能源流向有效管理（依能源績效指標規劃能源分攤機制並持續追蹤稽核）', type: 'count', cap: 2, subitems: [{label:'能源分攤機制',pts:1},{label:'連續紀錄/分析追蹤/外部稽核',pts:1}] },
           ]
         },
       ]
@@ -1285,7 +1285,7 @@ const VERSION_2024 = {
             { id: 'i5_1_2_2', label: '空氣品質環境資訊顯示（同上功能要求）', type: 'check', pts: 3 },
             { id: 'i5_1_2_3', label: '光環境資訊顯示（同上功能要求）', type: 'check', pts: 3 },
             { id: 'i5_1_2_4', label: '水環境資訊顯示（水箱水質偵測，同上功能要求）', type: 'check', pts: 3 },
-            { id: 'i5_1_3_1', label: '溫熱環境+空氣品質環境控制設施連動（外氣引入/空調連動）', note: '1分=溫熱環境連動、1分=空氣品質連動', type: 'tier', tiers: [0,1,2] },
+            { id: 'i5_1_3_1', label: '溫熱環境+空氣品質環境控制設施連動（外氣引入/空調連動）', type: 'count', cap: 2, subitems: [{label:'溫熱環境偵測連動外氣引入或空調',pts:1},{label:'空氣品質偵測連動外氣引入或空調',pts:1}] },
             { id: 'i5_1_3_2', label: '光環境控制設施連動（導入自然光或照明調節設施）', type: 'check', pts: 2 },
           ]
         },
@@ -1421,7 +1421,7 @@ const EASY_2024 = {
   // 指標3 安全防災（最容易取分的指標）
   'i3_1_1_5': true, // 漏水偵知
   'i3_1_2_1': 1,    // 災害告警顯示（1種）
-  'i3_1_2_2': 1,    // 連動設備狀態顯示（2種）
+  'i3_1_2_2': 2,    // 連動設備狀態顯示（2種，勾選2項才得1分）
   'i3_1_3_2': true, // 消防系統與空調整合連動
   'i3_2_1_2': true, // 語音對講整合行動通訊
   'i3_2_2_2': true, // 防盜警報行動通訊告警
@@ -1463,12 +1463,39 @@ function getCountItemScore(item, checked) {
     let pts = 0;
     for (const tier of tiers) { if (n >= tier.count) pts = tier.pts; }
     return pts;
+  } else if (item.countTiers) {
+    let pts = 0;
+    for (const tier of item.countTiers) { if (n >= tier.count) pts = tier.pts; }
+    return pts;
   } else {
     let sum = 0;
     for (const i of checked) {
       sum += (item.subitems[i] && item.subitems[i].pts !== undefined ? item.subitems[i].pts : 1);
     }
     return Math.min(sum, item.cap);
+  }
+}
+
+function _countFooter(item, checked) {
+  const n = checked.size;
+  const cScore = getCountItemScore(item, checked);
+  if (item.cableType) {
+    const maxCopperPts = item.tiersCopper[item.tiersCopper.length-1].pts;
+    const capStr = `（光纖上限 ${item.cap} 分 / 銅纜上限 ${maxCopperPts} 分）`;
+    return n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+  } else if (item.countTiers) {
+    const maxPts = item.countTiers[item.countTiers.length-1].pts;
+    if (n === 0) {
+      const ft = item.countTiers[0];
+      return `尚未勾選（勾選 ${ft.count} 項達 +${ft.pts} 分，最高 ${maxPts} 分）`;
+    }
+    let nextTier = null;
+    for (const t of item.countTiers) { if (n < t.count) { nextTier = t; break; } }
+    if (nextTier) return `已勾選 ${n} 項 → +${cScore}分（再選 ${nextTier.count - n} 項可達 +${nextTier.pts} 分）`;
+    return `已勾選 ${n} 項 → +${cScore}分 ✓`;
+  } else {
+    const capStr = `（上限 ${item.cap} 分）`;
+    return n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
   }
 }
 
@@ -1790,12 +1817,9 @@ function renderItem(item) {
         `id="cnt_${item.id}_${i}" ${isNA ? 'disabled' : ''} onclick="onCountCheck('${item.id}',${i})">` +
         `${sub.label}</button>`;
     }
-    const n = checked.size;
     const cScore = getCountItemScore(item, checked);
-    const capStr = item.cableType
-      ? `（光纖上限 ${item.cap} 分 / 銅纜上限 ${item.tiersCopper[item.tiersCopper.length-1].pts} 分）`
-      : `（上限 ${item.cap} 分）`;
-    const footerText = n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+    const footerText = _countFooter(item, checked);
+    const n = checked.size;
     controlHtml = `${cableHtml}<div class="count-checks">${rows}</div>` +
       `<div class="count-footer${n > 0 ? ' has-score' : ''}" id="cnt_footer_${item.id}">${footerText}</div>`;
     ptsText = cScore > 0 ? `+${cScore}分` : `0分`;
@@ -1875,12 +1899,9 @@ function refreshItem(item) {
     }
     const cScore = getCountItemScore(item, checked);
     const n = checked.size;
-    const capStr = item.cableType
-      ? `（光纖上限 ${item.cap} 分 / 銅纜上限 ${item.tiersCopper[item.tiersCopper.length-1].pts} 分）`
-      : `（上限 ${item.cap} 分）`;
     const footer = document.getElementById('cnt_footer_' + item.id);
     if (footer) {
-      footer.textContent = n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+      footer.textContent = _countFooter(item, checked);
       footer.className = 'count-footer' + (n > 0 ? ' has-score' : '');
     }
     const ptsEl = document.getElementById('pts_' + item.id);
@@ -1914,12 +1935,9 @@ function _updateCountUI(itemId, item) {
   const checked = countChecks[itemId] || new Set();
   const n = checked.size;
   const cScore = getCountItemScore(item, checked);
-  const capStr = item.cableType
-    ? `（光纖上限 ${item.cap} 分 / 銅纜上限 ${item.tiersCopper[item.tiersCopper.length-1].pts} 分）`
-    : `（上限 ${item.cap} 分）`;
   const footer = document.getElementById('cnt_footer_' + itemId);
   if (footer) {
-    footer.textContent = n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+    footer.textContent = _countFooter(item, checked);
     footer.className = 'count-footer' + (n > 0 ? ' has-score' : '');
   }
   const ptsEl = document.getElementById('pts_' + itemId);
