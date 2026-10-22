@@ -1446,6 +1446,7 @@ const scores = {}; // { itemId: value } — check: 0|pts, tier: 0|tierValue
 const countChecks = {}; // itemId -> Set of checked subitem indices (for type:'count')
 const cableTypes = {};  // itemId -> 'optic'|'copper' (for i1_1_2 cableType:true)
 let lastSelectAll = null; // null=none, false=不含加分, true=全加分, 'easy'=AI建議
+const openIndIds = new Set(); // tracks which indicator bodies are currently open
 
 function getVersionData() {
   return currentVersion === '2016' ? VERSION_2016 : VERSION_2024;
@@ -1756,6 +1757,13 @@ function renderContent(animClass) {
     container.appendChild(card);
   }
 
+  // Restore open/close state of indicators
+  openIndIds.forEach(id => {
+    const body = document.getElementById('body_' + id);
+    const chev = document.getElementById('chev_' + id);
+    if (body) body.classList.add('open');
+    if (chev) chev.classList.add('open');
+  });
   updateScores();
 }
 
@@ -2006,7 +2014,11 @@ let allExpanded = false;
 
 function toggleExpand() {
   allExpanded = !allExpanded;
-  document.querySelectorAll('.indicator-body').forEach(b => b.classList.toggle('open', allExpanded));
+  document.querySelectorAll('.indicator-body').forEach(b => {
+    b.classList.toggle('open', allExpanded);
+    const id = b.id.replace('body_', '');
+    if (allExpanded) openIndIds.add(id); else openIndIds.delete(id);
+  });
   document.querySelectorAll('.chevron').forEach(c => c.classList.toggle('open', allExpanded));
   const btn = document.getElementById('toggleExpandBtn');
   if (btn) btn.textContent = allExpanded ? '▼ 收合全指標' : '▶ 展開全指標';
@@ -2014,7 +2026,10 @@ function toggleExpand() {
 
 function expandAll() {
   allExpanded = true;
-  document.querySelectorAll('.indicator-body').forEach(b => b.classList.add('open'));
+  document.querySelectorAll('.indicator-body').forEach(b => {
+    b.classList.add('open');
+    openIndIds.add(b.id.replace('body_', ''));
+  });
   document.querySelectorAll('.chevron').forEach(c => c.classList.add('open'));
   const btn = document.getElementById('toggleExpandBtn');
   if (btn) btn.textContent = '▼ 收合全指標';
@@ -2022,6 +2037,7 @@ function expandAll() {
 
 function collapseAll() {
   allExpanded = false;
+  openIndIds.clear();
   document.querySelectorAll('.indicator-body').forEach(b => b.classList.remove('open'));
   document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
   const btn = document.getElementById('toggleExpandBtn');
@@ -2034,9 +2050,11 @@ function toggleIndicator(indId) {
   if (body.classList.contains('open')) {
     body.classList.remove('open');
     chev.classList.remove('open');
+    openIndIds.delete(indId);
   } else {
     body.classList.add('open');
     chev.classList.add('open');
+    openIndIds.add(indId);
   }
 }
 
@@ -2051,6 +2069,7 @@ function switchVersion(ver) {
   const anim = ver === '2024' ? 'anim-right' : 'anim-left';
   currentVersion = ver;
   lastSelectAll = null;
+  openIndIds.clear();
   document.querySelectorAll('.version-btn').forEach(b => {
     b.classList.toggle('active', b.textContent === ver + '版');
   });
