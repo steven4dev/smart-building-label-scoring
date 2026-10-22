@@ -439,10 +439,10 @@
     flex-shrink: 0;
   }
 
-  /* Checkbox-based tiered items */
+  /* Radio-based tiered items */
   .tier-checks { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
   .tier-check-row { display: flex; align-items: flex-start; gap: 8px; }
-  .tier-check-row input[type="checkbox"] {
+  .tier-check-row input[type="radio"] {
     width: 15px; height: 15px;
     accent-color: var(--accent);
     cursor: pointer;
@@ -1035,7 +1035,7 @@ const VERSION_2024 = {
           id: 's1_1', label: '1.1 佈線規劃設計（最高16分）',
           maxByType: { office: 16, residential: 16, commercial: 16 },
           items: [
-            { id: 'i1_1_2', label: '水平佈線支援不同系統需求（光纖架構）', note: '光纖：2分=3項、4分=6項、6分=9項、8分=12項；銅纜：2分=3項、4分=6項', type: 'tier', tiers: [0,2,4,6,8] },
+            { id: 'i1_1_2', label: '水平佈線支援不同系統需求（系統含電力/空調/照明/電梯/消防/監視/門禁/保全/對講/停車/緊急求救等）', note: '2分=光纖或銅纜支援3種系統以上、4分=光纖或銅纜支援6種系統以上、6分=光纖架構支援9種系統以上、8分=光纖架構支援12種系統以上', type: 'tier', tiers: [0,2,4,6,8] },
             { id: 'i1_1_3', label: '公眾行動通信涵蓋（室內地上/地下各層及電梯內）', note: '2分=符合', type: 'tier', tiers: [0,2] },
             { id: 'i1_1_4', label: '無線區域網路（在適當公共空間或工作區域設置Wi-Fi）', type: 'check', pts: 1 },
             { id: 'i1_1_5', label: '無線物聯網網路（BLE/ZigBee/LoRa/NB-IoT等蒐集環境/維運資訊）', type: 'check', pts: 2 },
@@ -1340,8 +1340,7 @@ const EASY_2024 = {
 // ============================================================
 let currentVersion = '2016';
 let currentType = 'office'; // office, residential, commercial
-const scores = {}; // { itemId: value }
-const tierChecks = {}; // { itemId: Set<tierValue> } — which tier checkboxes are checked
+const scores = {}; // { itemId: value } — check: 0|pts, tier: 0|tierValue
 let lastSelectAll = null; // null=none, false=不含加分, true=全加分, 'easy'=AI建議
 
 function getVersionData() {
@@ -1636,16 +1635,15 @@ function renderItem(item) {
   } else if (item.type === 'tier') {
     const tiers = getTiersForItem(item);
     const noteMap = parseTierNotes(item.note);
-    const checkedSet = tierChecks[item.id] || new Set();
     let rows = '';
     for (const t of tiers) {
       if (t === 0) continue;
-      const isChecked = checkedSet.has(t);
+      const isSelected = (curScore === t);
       const noteText = noteMap[t] || '';
       rows += `<div class="tier-check-row">` +
-        `<input type="checkbox" id="tchk_${item.id}_${t}" ${isChecked ? 'checked' : ''} ${isNA ? 'disabled' : ''} onchange="onTierCheck('${item.id}', ${t}, this.checked)">` +
-        `<label class="tier-check-label" for="tchk_${item.id}_${t}">` +
-        `<span class="tier-check-note">${noteText || `等級 +${t}分`}</span>` +
+        `<input type="radio" name="tier_${item.id}" id="trad_${item.id}_${t}" value="${t}" ${isSelected ? 'checked' : ''} ${isNA ? 'disabled' : ''} onclick="onTierSelect('${item.id}', ${t})">` +
+        `<label class="tier-check-label" for="trad_${item.id}_${t}">` +
+        `<span class="tier-check-note">${noteText || `+${t}分`}</span>` +
         `<span class="tier-check-pts">+${t}分</span>` +
         `</label></div>`;
     }
@@ -1699,13 +1697,13 @@ function refreshItem(item) {
       ptsEl.className = 'item-pts' + (curScore > 0 ? ' active' : '');
     }
   } else {
-    // Update tier checkboxes
+    // Update tier radios
     const tiers = getTiersForItem(item);
-    const checkedSet = tierChecks[item.id] || new Set();
+    const selectedVal = scores[item.id] || 0;
     for (const t of tiers) {
       if (t === 0) continue;
-      const chk = document.getElementById('tchk_' + item.id + '_' + t);
-      if (chk) { chk.checked = checkedSet.has(t); chk.disabled = isNA; }
+      const rad = document.getElementById('trad_' + item.id + '_' + t);
+      if (rad) { rad.checked = (selectedVal === t); rad.disabled = isNA; }
     }
     const ptsEl = document.getElementById('pts_' + item.id);
     if (ptsEl) {
@@ -1741,15 +1739,15 @@ function parseTierNotes(note) {
   return map;
 }
 
-function onTierCheck(itemId, tierValue, checked) {
-  if (!tierChecks[itemId]) tierChecks[itemId] = new Set();
-  if (checked) tierChecks[itemId].add(tierValue);
-  else tierChecks[itemId].delete(tierValue);
-  // Score = max of all checked tier values
-  const vals = [...tierChecks[itemId]];
-  scores[itemId] = vals.length > 0 ? Math.max(...vals) : 0;
-  // Update pts display
-  const curScore = scores[itemId];
+function onTierSelect(itemId, tierValue) {
+  // Radio click: if already selected, deselect (click again to clear)
+  if (scores[itemId] === tierValue) {
+    scores[itemId] = 0;
+    document.querySelectorAll(`input[name="tier_${itemId}"]`).forEach(r => r.checked = false);
+  } else {
+    scores[itemId] = tierValue;
+  }
+  const curScore = scores[itemId] || 0;
   const ptsEl = document.getElementById('pts_' + itemId);
   if (ptsEl) {
     ptsEl.textContent = curScore > 0 ? `+${curScore}分` : '0分';
@@ -1860,14 +1858,12 @@ function toggleTheme() {
 function resetAll() {
   lastSelectAll = null;
   for (const k in scores) delete scores[k];
-  for (const k in tierChecks) delete tierChecks[k];
   renderContent();
 }
 
 function selectAll(includeMaxTier) {
   lastSelectAll = includeMaxTier;
   for (const k in scores) delete scores[k]; // 每次先全清，確保切換時分數準確
-  for (const k in tierChecks) delete tierChecks[k];
   const data = getVersionData();
   for (const ind of data.indicators) {
     for (const sub of ind.subcats) {
@@ -1879,7 +1875,6 @@ function selectAll(includeMaxTier) {
           const tiers = item.tierByType ? (item.tierByType[currentType] || item.tiers) : item.tiers;
           const maxT = tiers[tiers.length - 1];
           scores[item.id] = maxT;
-          tierChecks[item.id] = new Set(tiers.filter(t => t > 0));
         }
       }
     }
@@ -1890,7 +1885,6 @@ function selectAll(includeMaxTier) {
 function selectEasy() {
   lastSelectAll = 'easy';
   for (const k in scores) delete scores[k];
-  for (const k in tierChecks) delete tierChecks[k];
   const data = getVersionData();
   const easyMap = currentVersion === '2016' ? EASY_2016 : EASY_2024;
   for (const ind of data.indicators) {
@@ -1902,7 +1896,6 @@ function selectEasy() {
           scores[item.id] = item.pts;
         } else if (typeof easyVal === 'number' && item.type === 'tier') {
           scores[item.id] = easyVal;
-          tierChecks[item.id] = new Set([easyVal]);
         }
       }
     }
