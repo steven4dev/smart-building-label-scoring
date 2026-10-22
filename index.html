@@ -464,6 +464,34 @@
   .tier-check-row input:checked ~ .tier-check-label .tier-check-note { color: var(--text); }
   .tier-check-row input:checked ~ .tier-check-label .tier-check-pts { color: var(--accent); font-weight: 600; }
 
+  /* Count-type items (each sub-item = checkbox, auto-sum with cap) */
+  .count-checks { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
+  .count-check-row { display: flex; align-items: flex-start; gap: 8px; }
+  .count-check-row input[type="checkbox"] {
+    width: 14px; height: 14px;
+    accent-color: var(--accent);
+    cursor: pointer;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .count-check-label { font-size: 12px; line-height: 1.4; color: var(--text2); cursor: pointer; flex: 1; }
+  .count-check-row input:checked ~ .count-check-label { color: var(--text); }
+  .count-footer {
+    font-size: 11px; color: var(--text3);
+    margin-top: 5px; padding-top: 4px;
+    border-top: 1px dashed var(--border);
+  }
+  .count-footer.has-score { color: var(--accent); font-weight: 500; }
+  .cable-select { display: flex; gap: 6px; margin-bottom: 6px; }
+  .cable-btn {
+    font-size: 11px; padding: 2px 8px;
+    border-radius: 4px; border: 1px solid var(--border);
+    background: var(--bg4); color: var(--text2);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .cable-btn:hover { border-color: var(--accent); color: var(--text); }
+  .cable-btn.active { background: var(--accent2); border-color: var(--accent); color: var(--text); }
+
   .item-pts {
     margin-left: auto;
     font-size: 12px;
@@ -943,9 +971,36 @@ const VERSION_2016 = {
           id: 's6_3', label: '6.3 節能技術', maxByType: { office: 15, residential: 15, commercial: 15 },
           items: [
             { id: 'i6_3_1', label: '建築外層智慧化節能（遮陽/窗戶/通風管道/追日型BIPV等）', note: '1分=佔外殼面積5%、2分=10%、3分=15%以上', type: 'tier', tiers: [0,1,2,3] },
-            { id: 'i6_3_2', label: '空調設備智慧化節能（人感/主機台數控制/VRV/VAV/CO₂外氣控制等）', note: '最多4分，每項1分，具智慧控制之空調面積≥50%', type: 'tier', tiers: [0,1,2,3,4] },
-            { id: 'i6_3_3', label: '照明設備智慧化節能（晝光利用/時程控制/人感/情境/調光/App等）', note: '最多4分，每項1分，場域樓地板面積≥20%或特定場域全面採用', type: 'tier', tiers: [0,1,2,3,4] },
-            { id: 'i6_3_4', label: '動力設備智慧化節能（泵/排風扇/電梯/熱泵等，具自動控制技術）', note: '最多3分，每項1分，設備數量≥80%', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i6_3_2', label: '空調設備智慧化節能（勾選具智慧控制技術之空調設備，空調面積≥50%方可計入，最多4項）', type: 'count', cap: 4,
+              subitems: [
+                { label: '人體感應控制' },
+                { label: '主機運轉台數控制' },
+                { label: '全熱交換器（熱回收）' },
+                { label: '多聯變頻（VRV）' },
+                { label: '變風量/變水量（VAV/VWV）' },
+                { label: 'CO₂外氣量控制' },
+                { label: '外氣冷房' },
+                { label: 'App或ICT雲端應用管理' },
+              ]
+            },
+            { id: 'i6_3_3', label: '照明設備智慧化節能（勾選具智慧照明控制技術，場域≥20%或特定場域全面採用，最多4項）', type: 'count', cap: 4,
+              subitems: [
+                { label: '晝光利用' },
+                { label: '時程控制' },
+                { label: '人員感知控制（人感）' },
+                { label: '情境模式控制' },
+                { label: '調光控制' },
+                { label: 'App或ICT雲端應用管理' },
+              ]
+            },
+            { id: 'i6_3_4', label: '動力設備智慧化節能（勾選具自動控制技術之動力設備，設備數量≥80%方可計入，最多3項）', type: 'count', cap: 3,
+              subitems: [
+                { label: '幫浦（Pump）' },
+                { label: '排風扇' },
+                { label: '電梯' },
+                { label: '熱泵' },
+              ]
+            },
             { id: 'i6_3_5', label: '調降空調/動力設備電源幹線(分路)線路電壓降使小於2%', type: 'check', pts: 1 },
           ]
         },
@@ -1035,7 +1090,31 @@ const VERSION_2024 = {
           id: 's1_1', label: '1.1 佈線規劃設計（最高16分）',
           maxByType: { office: 16, residential: 16, commercial: 16 },
           items: [
-            { id: 'i1_1_2', label: '水平佈線支援不同系統需求（系統含電力/空調/照明/電梯/消防/監視/門禁/保全/對講/停車/緊急求救等）', note: '2分=光纖或銅纜支援3種系統以上、4分=光纖或銅纜支援6種系統以上、6分=光纖架構支援9種系統以上、8分=光纖架構支援12種系統以上', type: 'tier', tiers: [0,2,4,6,8] },
+            { id: 'i1_1_2', label: '水平佈線支援不同系統需求（先選架構類型，再勾選所支援之系統）', type: 'count', cap: 8,
+              cableType: true,
+              tiersOptic:  [{count:3,pts:2},{count:6,pts:4},{count:9,pts:6},{count:12,pts:8}],
+              tiersCopper: [{count:3,pts:2},{count:6,pts:4}],
+              subitems: [
+                { label: '電力系統' },
+                { label: '空調系統' },
+                { label: '照明系統' },
+                { label: '衛生給排水' },
+                { label: '通風系統' },
+                { label: '電梯' },
+                { label: '消防系統' },
+                { label: '監視攝影' },
+                { label: '門禁管理' },
+                { label: '保全' },
+                { label: '對講' },
+                { label: '停車管理' },
+                { label: '緊急求救' },
+                { label: '智慧家庭自動化' },
+                { label: '無線網路' },
+                { label: '有線網路' },
+                { label: '網路電話交換機' },
+                { label: '多媒體播放' },
+              ]
+            },
             { id: 'i1_1_3', label: '公眾行動通信涵蓋（室內地上/地下各層及電梯內）', note: '2分=符合', type: 'tier', tiers: [0,2] },
             { id: 'i1_1_4', label: '無線區域網路（在適當公共空間或工作區域設置Wi-Fi）', type: 'check', pts: 1 },
             { id: 'i1_1_5', label: '無線物聯網網路（BLE/ZigBee/LoRa/NB-IoT等蒐集環境/維運資訊）', type: 'check', pts: 2 },
@@ -1057,7 +1136,16 @@ const VERSION_2024 = {
           items: [
             { id: 'i1_3_2', label: '建築動態數據庫（蒐集環境/行為/設備運轉等動態數據，採標準資料格式）', note: '1分=5種以上、2分=8種以上、3分=10種以上', type: 'tier', tiers: [0,1,2,3] },
             { id: 'i1_3_3', label: '備援機制（數據庫備援/網路備援/系統備援）', note: '1分=數據庫備援、2分=網路備援（雙環/雙路由）、3分=系統備援（熱備援/資料回溯）', type: 'tier', tiers: [0,1,2,3,4,5] },
-            { id: 'i1_3_4', label: '資訊安全（防火牆/操作權限/資料加密/雙因子認證/資安認證設備/軟體更新）', note: '各項1分，最高5分（防火牆、操作權限、加密、雙因子、資安認證、軟體更新）', type: 'tier', tiers: [0,1,2,3,4,5] },
+            { id: 'i1_3_4', label: '資訊安全（各項1分，最高5分）', type: 'count', cap: 5,
+              subitems: [
+                { label: '對外網路防火牆/防毒軟體機制（如：網頁防護、防毒掃描或入侵偵測）' },
+                { label: '應用系統之人機介面具備操作使用管理權限功能' },
+                { label: '資料儲存加密機制' },
+                { label: '雙因子的身份認證機制' },
+                { label: '採用資安認證設備（如台灣資通產業標準協會物聯網資安認證設備）' },
+                { label: '資訊安全相關設備具軟體更新功能（如：防毒軟體）' },
+              ]
+            },
             { id: 'i1_3_5', label: '區塊鏈加密機制（保全/門禁/緊急對講/監視攝影/主機登入紀錄等）', note: '2分=儲存2類資料、4分=儲存3類以上', type: 'tier', tiers: [0,2,4] },
           ]
         },
@@ -1161,7 +1249,13 @@ const VERSION_2024 = {
           id: 's4_3', label: '4.3 能源管理（最高18分）',
           maxByType: { office: 18, residential: 18, commercial: 18 },
           items: [
-            { id: 'i4_3_2', label: '空調效能持續監測與紀錄（冰水溫差/冷卻水趨近溫度/氣冷式入風溫度各1分）', note: '每項1分，最高3分', type: 'tier', tiers: [0,1,2,3] },
+            { id: 'i4_3_2', label: '空調效能持續監測與紀錄（每項1分，偵知並記錄運轉偏差率，偏差率應＜40%）', type: 'count', cap: 3,
+              subitems: [
+                { label: '空調冰水系統偵知冰水溫差並記錄運轉偏差率' },
+                { label: '空調冷卻水系統偵知趨近溫度並記錄運轉偏差率' },
+                { label: '氣冷式主機偵知入風溫度並記錄運轉偏差率' },
+              ]
+            },
             { id: 'i4_3_3', label: '智慧需量控制（用電設施卸載/儲能/創能控制 + AI機器學習）', note: '1分=卸載/儲能/創能管理、1分=導入AI機器學習深度學習', type: 'tier', tiers: [0,1,2] },
             { id: 'i4_3_4', label: '用電資訊視覺化顯示（插座/昇降/給排水/停車場/廚房熱水等分項用電）', note: '每具備2項可得1分，最高3分（採用率≥80%）', type: 'tier', tiers: [0,1,2,3] },
             { id: 'i4_3_5', label: '智慧用電管理（AI/神經網路/機器學習整合空調/照明/給排水/昇降機等）', note: '3分=整合2項以上、6分=整合4項以上、8分=整合6項以上', type: 'tier', tiers: [0,3,6,8] },
@@ -1341,6 +1435,8 @@ const EASY_2024 = {
 let currentVersion = '2024';
 let currentType = 'office'; // office, residential, commercial
 const scores = {}; // { itemId: value } — check: 0|pts, tier: 0|tierValue
+const countChecks = {}; // itemId -> Set of checked subitem indices (for type:'count')
+const cableTypes = {};  // itemId -> 'optic'|'copper' (for i1_1_2 cableType:true)
 let lastSelectAll = null; // null=none, false=不含加分, true=全加分, 'easy'=AI建議
 
 function getVersionData() {
@@ -1351,12 +1447,31 @@ function getVersionData() {
 // RENDER
 // ============================================================
 
+function getCountItemScore(item, checked) {
+  const n = checked.size;
+  if (item.cableType) {
+    const cable = cableTypes[item.id] || 'optic';
+    const tiers = cable === 'optic' ? item.tiersOptic : item.tiersCopper;
+    let pts = 0;
+    for (const tier of tiers) { if (n >= tier.count) pts = tier.pts; }
+    return pts;
+  } else {
+    let sum = 0;
+    for (const i of checked) {
+      sum += (item.subitems[i] && item.subitems[i].pts !== undefined ? item.subitems[i].pts : 1);
+    }
+    return Math.min(sum, item.cap);
+  }
+}
+
 function getItemScore(item) {
   const val = scores[item.id] || 0;
   if (item.type === 'check') {
     return val ? item.pts : 0;
   } else if (item.type === 'tier') {
     return Number(val) || 0;
+  } else if (item.type === 'count') {
+    return getCountItemScore(item, countChecks[item.id] || new Set());
   }
   return 0;
 }
@@ -1649,6 +1764,34 @@ function renderItem(item) {
     }
     controlHtml = `<div class="tier-checks">${rows}</div>`;
     ptsText = curScore > 0 ? `+${curScore}分` : `0分`;
+  } else if (item.type === 'count') {
+    const checked = countChecks[item.id] || new Set();
+    let cableHtml = '';
+    if (item.cableType) {
+      const cable = cableTypes[item.id] || 'optic';
+      cableHtml = `<div class="cable-select">` +
+        `<button class="cable-btn${cable === 'optic' ? ' active' : ''}" onclick="onCableType('${item.id}','optic')" ${isNA ? 'disabled' : ''}>光纖架構</button>` +
+        `<button class="cable-btn${cable === 'copper' ? ' active' : ''}" onclick="onCableType('${item.id}','copper')" ${isNA ? 'disabled' : ''}>銅纜架構</button>` +
+        `</div>`;
+    }
+    let rows = '';
+    for (let i = 0; i < item.subitems.length; i++) {
+      const sub = item.subitems[i];
+      const isChecked = checked.has(i);
+      rows += `<div class="count-check-row">` +
+        `<input type="checkbox" id="cnt_${item.id}_${i}" ${isChecked ? 'checked' : ''} ${isNA ? 'disabled' : ''} onchange="onCountCheck('${item.id}',${i},this.checked)">` +
+        `<label class="count-check-label" for="cnt_${item.id}_${i}">${sub.label}</label>` +
+        `</div>`;
+    }
+    const n = checked.size;
+    const cScore = getCountItemScore(item, checked);
+    const capStr = item.cableType
+      ? `（光纖上限 ${item.cap} 分 / 銅纜上限 ${item.tiersCopper[item.tiersCopper.length-1].pts} 分）`
+      : `（上限 ${item.cap} 分）`;
+    const footerText = n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+    controlHtml = `${cableHtml}<div class="count-checks">${rows}</div>` +
+      `<div class="count-footer${n > 0 ? ' has-score' : ''}" id="cnt_footer_${item.id}">${footerText}</div>`;
+    ptsText = cScore > 0 ? `+${cScore}分` : `0分`;
   }
 
   const easyMap = currentVersion === '2016' ? EASY_2016 : EASY_2024;
@@ -1656,7 +1799,7 @@ function renderItem(item) {
   const easyTag = isEasy && !isNA ? '<span class="easy-chip">💡 AI建議</span>' : '';
   const refNum = item.id.replace(/^i/, '').replace(/_/g, '.');
   // For tier items, note is parsed into per-tier checkboxes — skip the inline note block
-  const noteBlock = (item.note && item.type !== 'tier') ? `<div class="item-note">${item.note}</div>` : '';
+  const noteBlock = (item.note && item.type !== 'tier' && item.type !== 'count') ? `<div class="item-note">${item.note}</div>` : '';
   const labelHtml = `<div class="item-ref">§ ${refNum}</div><div class="item-label${isNA ? ' na' : ''}" style="${isNA ? 'color:var(--text3)' : ''}">${item.label}${isNA ? '<span class="na-chip">不適用</span>' : ''}${easyTag}</div>${noteBlock}`;
   const ptsHtml = `<div class="item-pts${curScore > 0 ? ' active' : ''}" id="pts_${item.id}">${ptsText}</div>`;
 
@@ -1696,7 +1839,7 @@ function refreshItem(item) {
       ptsEl.textContent = `+${item.pts}分`;
       ptsEl.className = 'item-pts' + (curScore > 0 ? ' active' : '');
     }
-  } else {
+  } else if (item.type === 'tier') {
     // Update tier radios
     const tiers = getTiersForItem(item);
     const selectedVal = scores[item.id] || 0;
@@ -1710,6 +1853,34 @@ function refreshItem(item) {
       ptsEl.textContent = curScore > 0 ? `+${curScore}分` : '0分';
       ptsEl.className = 'item-pts' + (curScore > 0 ? ' active' : '');
     }
+  } else if (item.type === 'count') {
+    const checked = countChecks[item.id] || new Set();
+    for (let i = 0; i < item.subitems.length; i++) {
+      const chk = document.getElementById('cnt_' + item.id + '_' + i);
+      if (chk) { chk.checked = checked.has(i); chk.disabled = isNA; }
+    }
+    if (item.cableType) {
+      const cable = cableTypes[item.id] || 'optic';
+      document.querySelectorAll(`.cable-btn[onclick*="${item.id}"]`).forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${cable}'`));
+        btn.disabled = isNA;
+      });
+    }
+    const cScore = getCountItemScore(item, checked);
+    const n = checked.size;
+    const capStr = item.cableType
+      ? `（光纖上限 ${item.cap} 分 / 銅纜上限 ${item.tiersCopper[item.tiersCopper.length-1].pts} 分）`
+      : `（上限 ${item.cap} 分）`;
+    const footer = document.getElementById('cnt_footer_' + item.id);
+    if (footer) {
+      footer.textContent = n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+      footer.className = 'count-footer' + (n > 0 ? ' has-score' : '');
+    }
+    const ptsEl = document.getElementById('pts_' + item.id);
+    if (ptsEl) {
+      ptsEl.textContent = cScore > 0 ? `+${cScore}分` : '0分';
+      ptsEl.className = 'item-pts' + (cScore > 0 ? ' active' : '');
+    }
   }
 }
 
@@ -1720,6 +1891,53 @@ function onCheck(itemId, checked, pts) {
     ptsEl.className = 'item-pts' + (checked ? ' active' : '');
   }
   updateScores();
+}
+
+function _findItem(itemId) {
+  const data = getVersionData();
+  for (const ind of data.indicators) {
+    for (const sub of ind.subcats) {
+      for (const it of sub.items) { if (it.id === itemId) return it; }
+    }
+  }
+  return null;
+}
+
+function _updateCountUI(itemId, item) {
+  const checked = countChecks[itemId] || new Set();
+  const n = checked.size;
+  const cScore = getCountItemScore(item, checked);
+  const capStr = item.cableType
+    ? `（光纖上限 ${item.cap} 分 / 銅纜上限 ${item.tiersCopper[item.tiersCopper.length-1].pts} 分）`
+    : `（上限 ${item.cap} 分）`;
+  const footer = document.getElementById('cnt_footer_' + itemId);
+  if (footer) {
+    footer.textContent = n > 0 ? `已勾選 ${n} 項 → +${cScore}分${capStr}` : `尚未勾選${capStr}`;
+    footer.className = 'count-footer' + (n > 0 ? ' has-score' : '');
+  }
+  const ptsEl = document.getElementById('pts_' + itemId);
+  if (ptsEl) {
+    ptsEl.textContent = cScore > 0 ? `+${cScore}分` : '0分';
+    ptsEl.className = 'item-pts' + (cScore > 0 ? ' active' : '');
+  }
+  updateScores();
+}
+
+function onCountCheck(itemId, subIdx, checked) {
+  if (!countChecks[itemId]) countChecks[itemId] = new Set();
+  if (checked) countChecks[itemId].add(subIdx);
+  else countChecks[itemId].delete(subIdx);
+  const item = _findItem(itemId);
+  if (item) _updateCountUI(itemId, item);
+}
+
+function onCableType(itemId, cable) {
+  cableTypes[itemId] = cable;
+  document.querySelectorAll(`.cable-btn[onclick*="${itemId}"]`).forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${cable}'`));
+  });
+  const item = _findItem(itemId);
+  if (item) _updateCountUI(itemId, item);
 }
 
 // Parse "3分=description、8分=description" note into {3: "desc", 8: "desc"}
@@ -1858,12 +2076,15 @@ function toggleTheme() {
 function resetAll() {
   lastSelectAll = null;
   for (const k in scores) delete scores[k];
+  for (const k in countChecks) delete countChecks[k];
+  for (const k in cableTypes) delete cableTypes[k];
   renderContent();
 }
 
 function selectAll(includeMaxTier) {
   lastSelectAll = includeMaxTier;
-  for (const k in scores) delete scores[k]; // 每次先全清，確保切換時分數準確
+  for (const k in scores) delete scores[k];
+  for (const k in countChecks) delete countChecks[k];
   const data = getVersionData();
   for (const ind of data.indicators) {
     for (const sub of ind.subcats) {
@@ -1873,8 +2094,10 @@ function selectAll(includeMaxTier) {
           scores[item.id] = item.pts;
         } else if (item.type === 'tier' && includeMaxTier) {
           const tiers = item.tierByType ? (item.tierByType[currentType] || item.tiers) : item.tiers;
-          const maxT = tiers[tiers.length - 1];
-          scores[item.id] = maxT;
+          scores[item.id] = tiers[tiers.length - 1];
+        } else if (item.type === 'count' && includeMaxTier) {
+          countChecks[item.id] = new Set();
+          for (let i = 0; i < item.subitems.length; i++) countChecks[item.id].add(i);
         }
       }
     }
@@ -1885,6 +2108,7 @@ function selectAll(includeMaxTier) {
 function selectEasy() {
   lastSelectAll = 'easy';
   for (const k in scores) delete scores[k];
+  for (const k in countChecks) delete countChecks[k];
   const data = getVersionData();
   const easyMap = currentVersion === '2016' ? EASY_2016 : EASY_2024;
   for (const ind of data.indicators) {
@@ -1896,6 +2120,11 @@ function selectEasy() {
           scores[item.id] = item.pts;
         } else if (typeof easyVal === 'number' && item.type === 'tier') {
           scores[item.id] = easyVal;
+        } else if (typeof easyVal === 'number' && item.type === 'count') {
+          countChecks[item.id] = new Set();
+          for (let i = 0; i < Math.min(easyVal, item.subitems.length); i++) {
+            countChecks[item.id].add(i);
+          }
         }
       }
     }
