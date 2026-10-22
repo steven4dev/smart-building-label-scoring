@@ -464,27 +464,35 @@
   .tier-check-row input:checked ~ .tier-check-label .tier-check-note { color: var(--text); }
   .tier-check-row input:checked ~ .tier-check-label .tier-check-pts { color: var(--accent); font-weight: 600; }
 
-  /* Count-type items (each sub-item = checkbox, auto-sum with cap) */
-  .count-checks { display: flex; flex-direction: column; gap: 4px; margin-top: 2px; }
-  .count-check-row { display: flex; align-items: flex-start; gap: 8px; }
-  .count-check-row input[type="checkbox"] {
-    width: 14px; height: 14px;
-    accent-color: var(--accent);
-    cursor: pointer;
-    flex-shrink: 0;
-    margin-top: 2px;
+  /* Count-type items — pill/tag toggle layout (wraps horizontally) */
+  .count-checks { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+  .count-pill {
+    display: inline-flex; align-items: center;
+    padding: 3px 10px; border-radius: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg3); color: var(--text2);
+    font-size: 12px; line-height: 1.5;
+    cursor: pointer; user-select: none;
+    transition: background 0.12s, border-color 0.12s, color 0.12s;
   }
-  .count-check-label { font-size: 12px; line-height: 1.4; color: var(--text2); cursor: pointer; flex: 1; }
-  .count-check-row input:checked ~ .count-check-label { color: var(--text); }
+  .count-pill:hover:not([disabled]) { border-color: var(--accent); color: var(--text); }
+  .count-pill.checked {
+    background: color-mix(in srgb, var(--accent) 18%, var(--bg3));
+    border-color: var(--accent);
+    color: var(--text);
+    font-weight: 500;
+  }
+  .count-pill[disabled] { opacity: 0.38; cursor: not-allowed; }
   .count-footer {
     font-size: 11px; color: var(--text3);
-    margin-top: 5px; padding-top: 4px;
+    margin-top: 6px; padding-top: 5px;
     border-top: 1px dashed var(--border);
+    width: 100%;
   }
   .count-footer.has-score { color: var(--accent); font-weight: 500; }
   .cable-select { display: flex; gap: 6px; margin-bottom: 6px; }
   .cable-btn {
-    font-size: 11px; padding: 2px 8px;
+    font-size: 11px; padding: 2px 10px;
     border-radius: 4px; border: 1px solid var(--border);
     background: var(--bg4); color: var(--text2);
     cursor: pointer; transition: all 0.15s;
@@ -1778,10 +1786,9 @@ function renderItem(item) {
     for (let i = 0; i < item.subitems.length; i++) {
       const sub = item.subitems[i];
       const isChecked = checked.has(i);
-      rows += `<div class="count-check-row">` +
-        `<input type="checkbox" id="cnt_${item.id}_${i}" ${isChecked ? 'checked' : ''} ${isNA ? 'disabled' : ''} onchange="onCountCheck('${item.id}',${i},this.checked)">` +
-        `<label class="count-check-label" for="cnt_${item.id}_${i}">${sub.label}</label>` +
-        `</div>`;
+      rows += `<button class="count-pill${isChecked ? ' checked' : ''}" ` +
+        `id="cnt_${item.id}_${i}" ${isNA ? 'disabled' : ''} onclick="onCountCheck('${item.id}',${i})">` +
+        `${sub.label}</button>`;
     }
     const n = checked.size;
     const cScore = getCountItemScore(item, checked);
@@ -1856,8 +1863,8 @@ function refreshItem(item) {
   } else if (item.type === 'count') {
     const checked = countChecks[item.id] || new Set();
     for (let i = 0; i < item.subitems.length; i++) {
-      const chk = document.getElementById('cnt_' + item.id + '_' + i);
-      if (chk) { chk.checked = checked.has(i); chk.disabled = isNA; }
+      const pill = document.getElementById('cnt_' + item.id + '_' + i);
+      if (pill) { pill.classList.toggle('checked', checked.has(i)); pill.disabled = isNA; }
     }
     if (item.cableType) {
       const cable = cableTypes[item.id] || 'optic';
@@ -1923,10 +1930,13 @@ function _updateCountUI(itemId, item) {
   updateScores();
 }
 
-function onCountCheck(itemId, subIdx, checked) {
+function onCountCheck(itemId, subIdx) {
   if (!countChecks[itemId]) countChecks[itemId] = new Set();
-  if (checked) countChecks[itemId].add(subIdx);
-  else countChecks[itemId].delete(subIdx);
+  const s = countChecks[itemId];
+  if (s.has(subIdx)) s.delete(subIdx); else s.add(subIdx);
+  // Immediately update pill appearance
+  const pill = document.getElementById('cnt_' + itemId + '_' + subIdx);
+  if (pill) pill.classList.toggle('checked', s.has(subIdx));
   const item = _findItem(itemId);
   if (item) _updateCountUI(itemId, item);
 }
