@@ -691,7 +691,7 @@
     <span class="score-mini-slash" id="miniMax">/ 200分</span>
     <div class="level-badge level-none" id="miniBadge">🔘 尚未達標</div>
     <div style="flex:1"></div>
-    <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折</button>
+    <button class="panel-toggle-btn" id="panelToggleBtn" onclick="togglePanel()">▲ 收折取分儀表</button>
   </div>
 </div>
 
@@ -2095,7 +2095,7 @@ function togglePanel() {
   const panel = document.getElementById('scorePanel');
   const btn = document.getElementById('panelToggleBtn');
   const collapsed = panel.classList.toggle('collapsed');
-  btn.textContent = collapsed ? '▼ 展開' : '▲ 收折';
+  btn.textContent = collapsed ? '▼ 展開取分儀表' : '▲ 收折取分儀表';
   // Update toolbar top after collapse/expand animation (0.3s transition)
   setTimeout(updateToolbarTop, 350);
 }
