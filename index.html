@@ -601,8 +601,8 @@
     <div style="display:flex;align-items:center;gap:8px">
       <div class="version-toggle" id="versionToggle">
         <span class="toggle-pill" id="versionPill"></span>
-        <button class="version-btn active" onclick="switchVersion('2016')">2016版</button>
-        <button class="version-btn" onclick="switchVersion('2024')">2024版</button>
+        <button class="version-btn" onclick="switchVersion('2016')">2016版</button>
+        <button class="version-btn active" onclick="switchVersion('2024')">2024版</button>
       </div>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="切換亮/暗主題">🌙</button>
     </div>
@@ -1338,7 +1338,7 @@ const EASY_2024 = {
 // ============================================================
 // STATE
 // ============================================================
-let currentVersion = '2016';
+let currentVersion = '2024';
 let currentType = 'office'; // office, residential, commercial
 const scores = {}; // { itemId: value } — check: 0|pts, tier: 0|tierValue
 let lastSelectAll = null; // null=none, false=不含加分, true=全加分, 'easy'=AI建議
