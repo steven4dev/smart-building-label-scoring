@@ -1176,8 +1176,8 @@ const VERSION_2024 = {
           id: 's2_2', label: '2.2 智慧工地管理（最高10分）',
           maxByType: { office: 10, residential: 10, commercial: 10 },
           items: [
-            { id: 'i2_2_1', label: '工地安全管理（防墜落感應/煙火偵測/開挖觀測即時回報等）', note: '2分=1項功能、4分=2項以上功能', type: 'tier', tiers: [0,2,4] },
-            { id: 'i2_2_2', label: '工地人員管理（實名制管理/定位追蹤等）', note: '2分=1項功能、4分=2項以上功能', type: 'tier', tiers: [0,2,4] },
+            { id: 'i2_2_1', label: '工地安全管理（防墜落感應/煙火偵測/開挖觀測即時回報等）', type: 'count', countTiers: [{count:1,pts:2},{count:2,pts:4}], subitems: [{label:'防墜落感應'},{label:'煙火偵測'},{label:'開挖觀測即時回報'},{label:'施工環境偵測（粉塵/噪音）'},{label:'工地週界侵入警報'}] },
+            { id: 'i2_2_2', label: '工地人員管理（實名制管理/定位追蹤等）', type: 'count', countTiers: [{count:1,pts:2},{count:2,pts:4}], subitems: [{label:'實名制管理（出入人員識別）'},{label:'人員定位追蹤'},{label:'工時與出勤紀錄'},{label:'安全帽/裝備穿戴偵測'}] },
             { id: 'i2_2_3', label: '工地資材管理（資材庫存管理/物料追蹤管理等）', type: 'check', pts: 2 },
           ]
         },
