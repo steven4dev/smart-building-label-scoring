@@ -1725,13 +1725,18 @@ function onCheck(itemId, checked, pts) {
 }
 
 // Parse "3分=description、8分=description" note into {3: "desc", 8: "desc"}
+// If duplicate tier values (e.g. "1分=A、1分=B"), concatenate with " / "
 function parseTierNotes(note) {
   const map = {};
   if (!note) return map;
   const parts = note.split(/[、，,；]/);
   for (const p of parts) {
-    const m = p.match(/^(\d+)\s*分\s*[=＝]\s*([\s\S]+)/);
-    if (m) map[parseInt(m[1])] = m[2].trim();
+    const m = p.match(/^(\d*\.?\d+)\s*分\s*[=＝]\s*([\s\S]+)/);
+    if (m) {
+      const k = parseFloat(m[1]);
+      const v = m[2].trim();
+      map[k] = map[k] ? map[k] + ' / ' + v : v;
+    }
   }
   return map;
 }
