@@ -1542,7 +1542,7 @@ function renderContent(animClass) {
   const toolbar = document.createElement('div');
   toolbar.className = 'toolbar';
   toolbar.innerHTML = `
-    <button class="reset-btn" id="toggleExpandBtn" onclick="toggleExpand()">⊞ 全展開</button>
+    <button class="reset-btn" id="toggleExpandBtn" onclick="toggleExpand()">▶ 展開全指標</button>
     <span style="flex:1"></span>
     <button class="select-easy-btn" onclick="selectEasy()">💡 AI建議取分</button>
     <button class="select-all-btn" onclick="selectAll(false)">☑ 全勾選（不含加分）</button>
@@ -1763,7 +1763,7 @@ function toggleExpand() {
   document.querySelectorAll('.indicator-body').forEach(b => b.classList.toggle('open', allExpanded));
   document.querySelectorAll('.chevron').forEach(c => c.classList.toggle('open', allExpanded));
   const btn = document.getElementById('toggleExpandBtn');
-  if (btn) btn.textContent = allExpanded ? '⊟ 全收摺' : '⊞ 全展開';
+  if (btn) btn.textContent = allExpanded ? '▼ 收合全指標' : '▶ 展開全指標';
 }
 
 function expandAll() {
@@ -1771,7 +1771,7 @@ function expandAll() {
   document.querySelectorAll('.indicator-body').forEach(b => b.classList.add('open'));
   document.querySelectorAll('.chevron').forEach(c => c.classList.add('open'));
   const btn = document.getElementById('toggleExpandBtn');
-  if (btn) btn.textContent = '⊟ 全收摺';
+  if (btn) btn.textContent = '▼ 收合全指標';
 }
 
 function collapseAll() {
@@ -1779,7 +1779,7 @@ function collapseAll() {
   document.querySelectorAll('.indicator-body').forEach(b => b.classList.remove('open'));
   document.querySelectorAll('.chevron').forEach(c => c.classList.remove('open'));
   const btn = document.getElementById('toggleExpandBtn');
-  if (btn) btn.textContent = '⊞ 全展開';
+  if (btn) btn.textContent = '▶ 展開全指標';
 }
 
 function toggleIndicator(indId) {
