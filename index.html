@@ -1187,7 +1187,7 @@ const VERSION_2024 = {
           items: [
             { id: 'i2_3_3', label: '行動化管理（智慧建築管理平台整合維運功能於行動裝置APP）', note: '2分=符合5項以上功能', type: 'tier', tiers: [0,2] },
             { id: 'i2_3_4', label: '建築資訊模型（BIM）整合', note: '1分=具BIM整合功能、3分=可視化瀏覽+即時設備資訊顯示、5分=+遠端控制功能', type: 'tier', tiers: [0,1,3,5] },
-            { id: 'i2_3_5', label: '營運數據應用（電梯/感測器/冰水主機/水位/高壓變壓器等故障預測分析）', note: '2分=1項後端分析/推估預測、4分=2項、6分=3項', type: 'tier', tiers: [0,2,4,6] },
+            { id: 'i2_3_5', label: '營運數據應用（電梯/感測器/冰水主機/水位/高壓變壓器等故障預測分析）', type: 'count', countTiers: [{count:1,pts:2},{count:2,pts:4},{count:3,pts:6}], subitems: [{label:'電梯故障預測分析'},{label:'感測器異常推估預測'},{label:'冰水主機故障預測分析'},{label:'水位異常即時分析'},{label:'高壓變壓器故障預測'}] },
           ]
         },
       ]
@@ -1280,7 +1280,7 @@ const VERSION_2024 = {
           id: 's5_1', label: '5.1 環境健康（最高20分）',
           maxByType: { office: 20, residential: 20, commercial: 20 },
           items: [
-            { id: 'i5_1_1_2', label: '空氣品質/光環境/水環境/室外環境偵知', note: '各1分：空氣品質(PM2.5/TVOC)、光環境(照度)、水環境(PH值/懸浮微粒)、室外環境(溫度/濕度/雨量)', type: 'tier', tiers: [0,1,2,3,4] },
+            { id: 'i5_1_1_2', label: '空氣品質/光環境/水環境/室外環境偵知', type: 'count', countTiers: [{count:1,pts:1},{count:2,pts:2},{count:3,pts:3},{count:4,pts:4}], subitems: [{label:'空氣品質偵知（PM2.5/TVOC/CO₂）'},{label:'光環境偵知（照度感測）'},{label:'水環境偵知（PH值/懸浮微粒）'},{label:'室外環境偵知（溫度/濕度/雨量）'}] },
             { id: 'i5_1_2_1', label: '溫熱環境資訊顯示（顯示器或APP揭露，納入管理平台，含紀錄/查詢/分析/異常提醒）', type: 'check', pts: 3 },
             { id: 'i5_1_2_2', label: '空氣品質環境資訊顯示（同上功能要求）', type: 'check', pts: 3 },
             { id: 'i5_1_2_3', label: '光環境資訊顯示（同上功能要求）', type: 'check', pts: 3 },
@@ -1337,7 +1337,7 @@ const VERSION_2024 = {
           id: 's6_3', label: '6.3 智慧建材（最高6分）',
           maxByType: { office: 6, residential: 6, commercial: 6 },
           items: [
-            { id: 'i6_3_1', label: '採用智慧建材（具感知/處理/致動/辨識/自預警/自修復功能，具公正第三方認證）', note: '3分=採用1項智慧建材、6分=採用2項以上', type: 'tier', tiers: [0,3,6] },
+            { id: 'i6_3_1', label: '採用智慧建材（具感知/處理/致動/辨識/自預警/自修復功能，具公正第三方認證）', type: 'count', countTiers: [{count:1,pts:3},{count:2,pts:6}], subitems: [{label:'感知型智慧建材'},{label:'處理型智慧建材'},{label:'致動型智慧建材'},{label:'辨識型智慧建材'},{label:'自預警型智慧建材'},{label:'自修復型智慧建材'}] },
           ]
         },
         {
